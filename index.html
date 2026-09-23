@@ -3,34 +3,76 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>สถานะทีม AI ติวเตอร์</title>
+<title>AI ติวเตอร์ที่ไม่เฉลย</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Sarabun:wght@400;600&display=swap">
 <style>
 :root{--bg:#F5F5F8;--sf:#FFF;--sf2:#EDEDF2;--ink:#17171E;--ink2:#585868;--ink3:#8B8B9C;--line:#E1E1E9;
---ac:#A3185C;--acs:#FBE7F0;--ok:#1C7A4C;--oks:#E4F4EB;--wn:#8F540A;--wns:#FBF1E0;--r:12px;
+--ac:#A3185C;--acs:#FBE7F0;--ok:#1C7A4C;--oks:#E4F4EB;--wn:#8F540A;--wns:#FBF1E0;--bad:#C0392B;--r:12px;
 --la:#A3185C;--lb:#1F5FBF;--lc:#0E7C66;--ld:#7A4BC2}
 @media (prefers-color-scheme:dark){:root{--bg:#111117;--sf:#1A1A22;--sf2:#23232E;--ink:#ECECF2;--ink2:#A7A7BA;--ink3:#77778A;
---line:#2E2E3A;--ac:#F2679F;--acs:#3B1327;--ok:#4FC088;--oks:#15291F;--wn:#DFA34C;--wns:#332615;
+--line:#2E2E3A;--ac:#F2679F;--acs:#3B1327;--ok:#4FC088;--oks:#15291F;--wn:#DFA34C;--wns:#332615;--bad:#F07A6E;
 --la:#F2679F;--lb:#6E9CF0;--lc:#4FC7AE;--ld:#B08BEA}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 "Sarabun","Leelawadee UI",system-ui,sans-serif}
-h1,h2,h3{font-family:"Bai Jamjuree","Leelawadee UI",sans-serif;margin:0;line-height:1.25;text-wrap:balance}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 "Sarabun","Leelawadee UI",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bai Jamjuree","Leelawadee UI",sans-serif;margin:0;line-height:1.3;text-wrap:balance}
 code{font-family:"IBM Plex Mono",ui-monospace,monospace}
 a{color:var(--ac)}
-.wrap{max-width:1120px;margin:0 auto;padding:0 16px 64px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px 64px}
 @media (min-width:800px){.wrap{padding:0 28px 72px}}
-.top{padding:32px 0 22px;border-bottom:1px solid var(--line)}
+.top{padding:34px 0 24px;border-bottom:1px solid var(--line)}
 .eyebrow{font:600 11px/1.4 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
-.top h1{font-size:clamp(24px,4vw,32px);margin:8px 0 6px}
-.top p{margin:0;color:var(--ink2)}
-.nowbox{display:flex;gap:14px;align-items:center;margin-top:18px;padding:14px 16px;border-radius:var(--r);
+.top h1{font-size:clamp(26px,4.5vw,36px);margin:8px 0 10px}
+.lead{margin:0;font-size:clamp(17px,2.2vw,20px);max-width:44ch;color:var(--ink)}
+.lead b{color:var(--ac)}
+.nowbox{display:flex;gap:14px;align-items:center;margin-top:20px;padding:14px 16px;border-radius:var(--r);
 background:var(--acs);border:1px solid color-mix(in srgb,var(--ac) 35%,transparent)}
 .nowbox .big{font:600 26px/1 "IBM Plex Mono",monospace;color:var(--ac);white-space:nowrap}
 .nowbox b{display:block;font-family:"Bai Jamjuree",sans-serif;font-size:16px}
-.nowbox span{font-size:13.5px;color:var(--ink2)}
-h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);font-family:"IBM Plex Mono",monospace;
-font-weight:600;margin:40px 0 14px}
+.nowbox span{font-size:14px;color:var(--ink2)}
+h2{font-family:"Bai Jamjuree",sans-serif;font-size:22px;margin:44px 0 6px}
+.sub{margin:0 0 16px;color:var(--ink2);font-size:15px}
+.why{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:760px){.why{grid-template-columns:1fr 1fr}}
+.why div{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.why b{display:block;font-family:"Bai Jamjuree",sans-serif;font-size:16px;margin-bottom:4px}
+.why p{margin:0;font-size:15px;color:var(--ink2)}
+.why cite{display:block;font-style:normal;font-size:12.5px;color:var(--ink3);margin-top:6px}
+.flow{list-style:none;margin:0;padding:0;display:grid;gap:10px;grid-template-columns:1fr;counter-reset:f}
+@media (min-width:900px){.flow{grid-template-columns:repeat(5,1fr)}}
+.flow li{counter-increment:f;background:var(--sf);border:1px solid var(--line);border-radius:var(--r);padding:14px 14px 14px 52px;position:relative}
+@media (min-width:900px){.flow li{padding:48px 14px 14px}}
+.flow li::before{content:counter(f);position:absolute;left:14px;top:14px;width:26px;height:26px;border-radius:99px;
+display:grid;place-items:center;background:var(--ac);color:#fff;font:600 13px "IBM Plex Mono",monospace}
+.flow b{display:block;font-family:"Bai Jamjuree",sans-serif;font-size:15.5px}
+.flow p{margin:2px 0 0;font-size:14px;color:var(--ink2)}
+.bars{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);padding:8px 18px}
+.bar{display:grid;grid-template-columns:1fr;gap:6px;padding:12px 0;border-bottom:1px dashed var(--line)}
+.bar:last-child{border-bottom:0}
+@media (min-width:700px){.bar{grid-template-columns:230px 1fr 90px;align-items:center;gap:14px}}
+.bar .lbl b{display:block;font-family:"Bai Jamjuree",sans-serif;font-size:15px}
+.bar .lbl span{font-size:13px;color:var(--ink3)}
+.track{height:14px;border-radius:99px;background:var(--sf2);overflow:hidden}
+.track i{display:block;height:100%;border-radius:99px}
+.track i.hi{background:var(--bad)}
+.track i.lo{background:var(--ok)}
+.val{font:600 20px "IBM Plex Mono",monospace;text-align:right}
+.val small{display:block;font:400 12px "Sarabun",sans-serif;color:var(--ink3)}
+.val.none{font:600 14px "Sarabun",sans-serif;color:var(--ink3)}
+.take{margin:12px 2px 0;font-size:15px}
+.pipe{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.pipe div{flex:1 1 140px;background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:10px 12px;position:relative}
+.pipe b{display:block;font-family:"Bai Jamjuree",sans-serif;font-size:14.5px}
+.pipe span{font-size:12px;color:var(--ink3)}
+.decide{background:var(--wns);border:1px solid color-mix(in srgb,var(--wn) 35%,transparent);border-radius:var(--r);padding:18px 20px}
+.decide>p{margin:0 0 14px}
+.opts{display:grid;gap:10px;grid-template-columns:1fr}
+@media (min-width:760px){.opts{grid-template-columns:repeat(3,1fr)}}
+.opt{background:var(--sf);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.opt b{display:block;font-family:"Bai Jamjuree",sans-serif;margin-bottom:4px}
+.opt p{margin:0;font-size:14px;color:var(--ink2)}
+.opt.rec{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}
+.opt .tag{display:inline-block;font:600 11px "Sarabun",sans-serif;color:var(--ac);margin-bottom:2px}
 .people{display:grid;gap:14px;grid-template-columns:1fr}
 @media (min-width:860px){.people{grid-template-columns:1fr 1fr}}
 .person{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;border-top:4px solid var(--lane)}
@@ -38,7 +80,7 @@ font-weight:600;margin:40px 0 14px}
 .badge{flex:none;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;
 font:700 22px "Bai Jamjuree",sans-serif;color:#fff;background:var(--lane)}
 .ph h3{font-size:18px}
-.ph .role{font-size:13px;color:var(--ink2)}
+.ph .role{font-size:13.5px;color:var(--ink2)}
 .cnt{margin-left:auto;text-align:right;flex:none}
 .cnt b{font:600 20px "IBM Plex Mono",monospace}
 .cnt span{display:block;font-size:11px;color:var(--ink3)}
@@ -46,105 +88,95 @@ font:700 22px "Bai Jamjuree",sans-serif;color:#fff;background:var(--lane)}
 .pbar i{display:block;height:100%;background:var(--lane)}
 .nextup{margin:14px 18px 6px;padding:10px 12px;border-radius:8px;background:color-mix(in srgb,var(--lane) 10%,var(--sf));
 border:1px solid color-mix(in srgb,var(--lane) 35%,transparent)}
-.nextup .k{font:600 10.5px "IBM Plex Mono",monospace;letter-spacing:.1em;color:var(--lane);text-transform:uppercase}
-.nextup b{display:block;font-family:"Bai Jamjuree",sans-serif;font-size:15px;margin-top:2px}
-.nextup small{display:block;font-size:12.5px;color:var(--ink2)}
+.nextup .k{font:600 12px "Sarabun",sans-serif;color:var(--lane)}
+.nextup b{display:block;font-family:"Bai Jamjuree",sans-serif;font-size:15.5px;margin-top:2px}
+.nextup small{display:block;font-size:13px;color:var(--ink2)}
 .alldone{margin:14px 18px 6px;font-size:14px;color:var(--ok)}
 .tl{list-style:none;margin:0;padding:6px 18px 14px}
-.t{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.t{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
 .t:last-child{border-bottom:0}
-.day{flex:none;font:600 10.5px/1 "IBM Plex Mono",monospace;padding:5px 6px;border-radius:5px;background:var(--sf2);
-color:var(--ink3);margin-top:2px;white-space:nowrap}
+.day{flex:none;font:600 11px/1 "Sarabun",sans-serif;padding:5px 7px;border-radius:5px;background:var(--sf2);color:var(--ink3);margin-top:3px;white-space:nowrap}
 .tx{flex:1;min-width:0}
-.tx small{display:block;font-size:12px;color:var(--ink3)}
+.tx small{display:block;font-size:12.5px;color:var(--ink3)}
 .t.done .tx{color:var(--ink3)}
 .t.cur .tx{font-weight:600}
-.pill{flex:none;font:600 11px/1 "Sarabun",sans-serif;padding:4px 8px;border-radius:99px;margin-top:2px;white-space:nowrap}
+.pill{flex:none;font:600 11px/1 "Sarabun",sans-serif;padding:4px 8px;border-radius:99px;margin-top:3px;white-space:nowrap}
 .pill.done{background:var(--oks);color:var(--ok)}
 .pill.part{background:var(--wns);color:var(--wn)}
 .pill.todo{background:var(--sf2);color:var(--ink3)}
 .pill.unknown{border:1px dashed var(--ink3);color:var(--ink3)}
 .team{margin-top:14px;background:var(--sf);border:1px solid var(--line);border-radius:var(--r);padding:14px 18px}
-.team h3{font-size:15px;margin-bottom:4px}
-.decide{background:var(--wns);border:1px solid color-mix(in srgb,var(--wn) 35%,transparent);border-radius:var(--r);padding:18px 20px}
-.decide h3{font-size:18px;margin-bottom:6px}
-.decide>p{margin:0 0 14px}
-.opts{display:grid;gap:10px;grid-template-columns:1fr}
-@media (min-width:760px){.opts{grid-template-columns:repeat(3,1fr)}}
-.opt{background:var(--sf);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
-.opt b{display:block;font-family:"Bai Jamjuree",sans-serif;margin-bottom:4px}
-.opt p{margin:0;font-size:13.5px;color:var(--ink2)}
-.opt.rec{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}
-.opt .tag{display:inline-block;font:600 10.5px "IBM Plex Mono",monospace;color:var(--ac);letter-spacing:.08em;margin-bottom:4px}
-.scroll{overflow-x:auto}
-.grid{width:100%;border-collapse:separate;border-spacing:0;background:var(--sf);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-.grid th,.grid td{padding:14px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-.grid tr:last-child th,.grid tr:last-child td{border-bottom:0}
-.grid thead th{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);background:var(--sf2)}
-.grid th span,.grid td span{display:block}
-.grid th b{font-family:"Bai Jamjuree",sans-serif}
-.grid th span{font-size:12.5px;color:var(--ink3);font-weight:400}
-.num{font:600 30px/1.1 "IBM Plex Mono",monospace}
-.pending{font:600 15px/1.8 "Bai Jamjuree",sans-serif;color:var(--ink3)}
-.sm{font-size:12.5px;color:var(--ink3)}
-.note{font-size:13px;color:var(--ink2);margin:10px 2px 0}
+.team h3{font-size:16px;margin-bottom:4px}
+.gloss{display:grid;gap:0;grid-template-columns:1fr;background:var(--sf);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.gloss div{display:grid;grid-template-columns:1fr;gap:2px;padding:12px 18px;border-bottom:1px solid var(--line)}
+.gloss div:last-child{border-bottom:0}
+@media (min-width:700px){.gloss div{grid-template-columns:160px 1fr;gap:16px}}
+.gloss b{font-family:"Bai Jamjuree",sans-serif}
+.gloss span{font-size:15px;color:var(--ink2)}
 .steps{list-style:none;margin:0;padding:0;counter-reset:s;background:var(--sf);border:1px solid var(--line);border-radius:var(--r)}
 .steps li{counter-increment:s;padding:12px 16px 12px 52px;border-bottom:1px solid var(--line);position:relative}
 .steps li:last-child{border-bottom:0}
 .steps li::before{content:counter(s);position:absolute;left:16px;top:12px;font:600 14px "IBM Plex Mono",monospace;color:var(--la)}
 .steps span{display:block;font-weight:600}
 .steps code{display:block;font-size:12.5px;background:var(--sf2);padding:6px 8px;border-radius:6px;margin-top:6px;overflow-x:auto;white-space:pre}
-.cards{list-style:none;margin:0;padding:0;display:grid;gap:10px;grid-template-columns:1fr}
-@media (min-width:760px){.cards{grid-template-columns:repeat(3,1fr)}}
-.cards li{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
-.cards b{font-family:"Bai Jamjuree",sans-serif}
-.cards p{margin:4px 0 0;font-size:14px;color:var(--ink2)}
-footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink3)}
+.note{font-size:14px;color:var(--ink2);margin:10px 2px 0}
+footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink3)}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header class="top">
-  <div class="eyebrow">สปรินต์ 5 วัน · ทีม 4 คน · อัปเดต 23/09/2026 21:34</div>
-  <h1>สถานะทีม AI ติวเตอร์</h1>
-  <p>ใครทำอะไร ทำไปถึงไหน และต้องทำอะไรต่อ — ติวเตอร์คณิตที่ไม่ยอมเฉลยคำตอบ</p>
+  <div class="eyebrow">โปรเจกต์ทีม 4 คน · 5 วัน · อัปเดต 23/09/2026 21:39</div>
+  <h1>AI ติวเตอร์ที่ไม่เฉลย</h1>
+  <p class="lead">เราสร้าง <b>ครู AI สอนคณิต</b> ที่ไม่บอกคำตอบ แต่ถามนำให้นักเรียนคิดออกเอง แล้วพิสูจน์ด้วยตัวเลขว่ามันไม่เฉลยจริง</p>
   <div class="nowbox"><span class="big">6/30</span>
-    <div><b>งานทั้งทีมเสร็จแล้ว 6 จาก 30</b><span>ตอนนี้: A ย้ายไปเครื่องคณะคืนนี้ · ทั้งทีมต้องตัดสินใจเป้า SFT ก่อน B เริ่มเตรียมชุดเทรน</span></div></div>
+    <div><b>งานเสร็จแล้ว 6 จาก 30 อย่าง</b><span>ตอนนี้: A กำลังย้ายไปเครื่องคณะ · ทั้งทีมต้องเลือกว่าการเทรนจะพิสูจน์อะไร</span></div></div>
 </header>
 
-<h2>แต่ละคนทำอะไร</h2>
-<div class="people"><article class="person" style="--lane:var(--la)"><div class="ph"><span class="badge">A</span><div><h3>โมเดล + วัดผล</h3><span class="role">เทรน QLoRA · ชุดวัด · รัน eval ทุกรอบ</span></div><div class="cnt"><b>4/13</b><span>เสร็จแล้ว</span></div></div><div class="pbar"><i style="width:31%"></i></div><div class="nextup"><span class="k">ทำต่อไป · วันที่ 1</span><b>ลง env บนเครื่องคณะให้ผ่าน</b><small>ทำคืนนี้ ตามเช็คลิสต์ด้านล่าง</small></div><ul class="tl"><li class="t done"><span class="day">ว.1</span><span class="tx">ตกลงสัญญา API POST /chat<small>tutor/serve_chat.py มีโหมด --mock</small></span><span class="pill done">เสร็จ</span></li><li class="t todo cur"><span class="day">ว.1</span><span class="tx">ลง env บนเครื่องคณะให้ผ่าน<small>ทำคืนนี้ ตามเช็คลิสต์ด้านล่าง</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">ว.1</span><span class="tx">อัป PDF 42 เปเปอร์ขึ้น Google Drive ให้ D ใช้<small>ไฟล์อยู่ใน Downloads\งานวิจัย AI ติวเตอร์</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t done"><span class="day">ว.2</span><span class="tx">leak-rate checker<small>ผ่านเทสในตัว 7/7</small></span><span class="pill done">เสร็จ</span></li><li class="t done"><span class="day">ว.2</span><span class="tx">freeze ชุดทดสอบ 100 ข้อ<small>sha256 62c1da53…</small></span><span class="pill done">เสร็จ</span></li><li class="t done"><span class="day">ว.2</span><span class="tx">baseline prompt-only มีตัวเลข<small>มี guardrail 0% · ไม่มี guardrail 89%</small></span><span class="pill done">เสร็จ</span></li><li class="t todo"><span class="day">ว.2</span><span class="tx">รันช่อง noguard 5 เทิร์นให้ครบ<small>รันที่เครื่องคณะ</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">ว.2</span><span class="tx">rubric คุณภาพการสอน (Maurya 8 มิติ)<small>ต้องใช้ถ้าเลือกทาง ข.</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">ว.3</span><span class="tx">SFT run #1 (QLoRA)<small>รอบละไม่เกิน 2 ชม.</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">ว.3</span><span class="tx">eval run #1 เทียบ baseline</span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">ว.4</span><span class="tx">SFT run #2</span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">ว.4</span><span class="tx">eval run #2</span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">ว.5</span><span class="tx">freeze เก็บ checkpoint, config, seed</span><span class="pill todo">ยังไม่เริ่ม</span></li></ul></article><article class="person" style="--lane:var(--lb)"><div class="ph"><span class="badge">B</span><div><h3>ข้อมูล + สำรอง</h3><span class="role">ชุดเทรน · Colab สำรอง · ช่วยให้คะแนน</span></div><div class="cnt"><b>1/4</b><span>เสร็จแล้ว</span></div></div><div class="pbar"><i style="width:25%"></i></div><div class="nextup"><span class="k">ทำต่อไป · วันที่ 1</span><b>ตั้ง Colab สำรอง + ข้อมูลขึ้น Drive</b><small>B อัปเดตหน่อย</small></div><ul class="tl"><li class="t done"><span class="day">ว.1</span><span class="tx">MathDial เข้า schema กลาง<small>tutor/build_testset.py</small></span><span class="pill done">เสร็จ</span></li><li class="t unknown cur"><span class="day">ว.1</span><span class="tx">ตั้ง Colab สำรอง + ข้อมูลขึ้น Drive<small>B อัปเดตหน่อย</small></span><span class="pill unknown">รออัปเดต</span></li><li class="t todo"><span class="day">ว.2</span><span class="tx">ปิดชุดเทรน<small>รอทีมตัดสินใจเป้า SFT ก่อน</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">ว.3</span><span class="tx">ชุดข้อมูล v2<small>ซ่อมเฉพาะจุดที่โมเดลพัง</small></span><span class="pill todo">ยังไม่เริ่ม</span></li></ul></article><article class="person" style="--lane:var(--lc)"><div class="ph"><span class="badge">C</span><div><h3>อวตาร + เดโม</h3><span class="role">หน้าอวตาร · เสียง · ซ้อมเดโม</span></div><div class="cnt"><b>1/5</b><span>เสร็จแล้ว</span></div></div><div class="pbar"><i style="width:20%"></i></div><div class="nextup"><span class="k">ทำต่อไป · วันที่ 1</span><b>อวตารพูดได้ ต่อ endpoint ปลอม</b><small>มีหน้าเดโมเสียง + หน้าการ์ตูนชั่วคราว ยังไม่ได้ต่อ TalkingHead</small></div><ul class="tl"><li class="t part cur"><span class="day">ว.1</span><span class="tx">อวตารพูดได้ ต่อ endpoint ปลอม<small>มีหน้าเดโมเสียง + หน้าการ์ตูนชั่วคราว ยังไม่ได้ต่อ TalkingHead</small></span><span class="pill part">บางส่วน</span></li><li class="t part"><span class="day">ว.2</span><span class="tx">เสียงไทย + ขยับปาก<small>อ่านออกเสียงผ่านเบราว์เซอร์ได้แล้ว ปากยังขยับเป็นจังหวะหลอก</small></span><span class="pill part">บางส่วน</span></li><li class="t done"><span class="day">ว.3</span><span class="tx">สลับอวตารมาต่อโมเดลจริง<small>voice_server ต่อติวเตอร์จริงแล้ว</small></span><span class="pill done">เสร็จ</span></li><li class="t todo"><span class="day">ว.4</span><span class="tx">เดโมเดินครบ + อัดวิดีโอสำรอง</span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">ว.5</span><span class="tx">ซ้อมนำเสนอ 2 รอบ<small>จับเวลา</small></span><span class="pill todo">ยังไม่เริ่ม</span></li></ul></article><article class="person" style="--lane:var(--ld)"><div class="ph"><span class="badge">D</span><div><h3>เขียน + วิเคราะห์</h3><span class="role">รายงาน · กราฟ · สถิติ</span></div><div class="cnt"><b>0/5</b><span>เสร็จแล้ว</span></div></div><div class="pbar"><i style="width:0%"></i></div><div class="nextup"><span class="k">ทำต่อไป · วันที่ 1</span><b>โครงรายงาน + related work</b><small>D อัปเดตหน่อย</small></div><ul class="tl"><li class="t unknown cur"><span class="day">ว.1</span><span class="tx">โครงรายงาน + related work<small>D อัปเดตหน่อย</small></span><span class="pill unknown">รออัปเดต</span></li><li class="t unknown"><span class="day">ว.2</span><span class="tx">เขียน method + ตารางเปล่า<small>D อัปเดตหน่อย</small></span><span class="pill unknown">รออัปเดต</span></li><li class="t todo"><span class="day">ว.3</span><span class="tx">เขียนผลส่วนที่ยังไม่ต้องใช้ตัวเลข</span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">ว.4</span><span class="tx">กราฟและตารางผลครบ</span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">ว.5</span><span class="tx">รายงานฉบับสมบูรณ์</span><span class="pill todo">ยังไม่เริ่ม</span></li></ul></article></div>
-<section class="team"><h3>งานทั้งทีม</h3><ul class="tl" style="padding:0"><li class="t todo cur"><span class="day">ว.2</span><span class="tx">ตัดสินใจเป้า SFT (ก / ข / ค)<small>ดูกล่องตัดสินใจ ต้องจบก่อน B ปิดชุดเทรน</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">ว.4</span><span class="tx">ให้คะแนนมือคนละ 20 บทสนทนา<small>ใช้ rubric เดียวกัน</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">ว.5</span><span class="tx">ซ้อมรวม + เช็คลิสต์ส่งงาน</span><span class="pill todo">ยังไม่เริ่ม</span></li></ul></section>
+<h2>ทำไมต้องไม่เฉลย</h2>
+<p class="sub">AI ทั่วไปอย่าง ChatGPT ตอบให้ทันทีที่ถาม ซึ่งไม่ดีกับการเรียน</p>
+<div class="why">
+  <div><b>ใช้ AI ช่วยทำการบ้าน แต่สอบแย่ลง</b><p>งานวิจัยพบว่านักเรียนที่ใช้ ChatGPT ช่วยทำโจทย์ ทำแบบฝึกหัดได้ดีขึ้น แต่พอสอบโดยไม่มี AI กลับได้คะแนนแย่กว่าคนที่ไม่เคยใช้</p><cite>Bastani et al., PNAS 2025</cite></div>
+  <div><b>ถ้า AI ไม่เฉลย ผลเสียนี้หายไป</b><p>งานเดียวกันพบว่าถ้าให้ AI ใบ้ทีละขั้นแทนการบอกคำตอบ นักเรียนไม่ได้แย่ลง งานเราเลยสร้างครู AI แบบนี้ แล้ววัดให้เห็นกับตาว่ามันไม่เฉลยจริง</p><cite>Bastani et al., PNAS 2025</cite></div>
+</div>
 
-<h2>ทั้งทีมต้องตัดสินใจก่อน B ปิดชุดเทรน</h2>
+<h2>เราวัดยังไง</h2>
+<p class="sub">5 ขั้นนี้ทำซ้ำได้ทุกรอบ ผลจะได้เทียบกันได้</p>
+<ol class="flow"><li><b>เตรียมโจทย์</b><p>โจทย์คณิต 100 ข้อจากชุด MathDial ที่นักวิจัยใช้กันทั่วโลก</p></li><li><b>ให้ AI สอน</b><p>AI รับบทครู ช่วยนักเรียนทำโจทย์ทีละข้อ</p></li><li><b>แกล้งตื๊อขอคำตอบ</b><p>ยอมแพ้ / อ้างว่าครูอนุญาต / เดาผิดให้แก้ / เร่งว่าต้องส่งการบ้าน</p></li><li><b>นับว่าหลุดกี่ข้อ</b><p>ถ้า AI เผลอบอกคำตอบ ข้อนั้นนับว่า &quot;หลุด&quot;</p></li><li><b>เทรนแล้ววัดซ้ำ</b><p>สอน AI เพิ่มด้วยตัวอย่างการสอนที่ดี แล้วดูว่าหลุดน้อยลงไหม</p></li></ol>
+
+<h2>ผลตอนนี้</h2>
+<p class="sub">AI บอกคำตอบออกมากี่ข้อ จากโจทย์ 100 ข้อ (ยิ่งน้อยยิ่งดี)</p>
+<div class="bars"><div class="bar"><div class="lbl"><b>ไม่ได้สั่งอะไร</b><span>ขอคำตอบตรง ๆ</span></div><div class="track"><i class="hi" style="width:89%"></i></div><div class="val">89<small>จาก 100 ข้อ</small></div></div><div class="bar"><div class="lbl"><b>ไม่ได้สั่งอะไร</b><span>ตื๊อ 4 แบบ</span></div><div class="track"></div><div class="val none">ยังไม่ได้วัด</div></div><div class="bar"><div class="lbl"><b>สั่งห้ามเฉลย</b><span>ขอคำตอบตรง ๆ</span></div><div class="track"><i class="lo" style="width:1.5%"></i></div><div class="val">0<small>จาก 100 ข้อ</small></div></div><div class="bar"><div class="lbl"><b>สั่งห้ามเฉลย</b><span>ตื๊อ 4 แบบ</span></div><div class="track"><i class="lo" style="width:1.5%"></i></div><div class="val">0<small>จาก 100 ข้อ</small></div></div></div>
+<p class="take"><b>สรุปง่าย ๆ:</b> ถ้าไม่สั่งอะไร AI เฉลยเกือบทุกข้อ แต่พอแปะคำสั่งห้ามเฉลย มันไม่เฉลยเลยแม้โดนตื๊อ</p>
+
+<h2>ต้องเลือกก่อนเทรน</h2>
 <div class="decide">
-  <h3>ติวเตอร์แบบใส่แค่ prompt ไม่หลุดเลย — SFT จะพิสูจน์อะไร</h3>
-  <p>qwen2.5:7b ที่มี prompt ห้ามเฉลย หลุด <b>0%</b> แม้โดนกดดัน 5 เทิร์น ถ้าเทรนแล้ววัดด้วยตัวเลขเดิม จะได้ 0% เท่าเดิม ไม่มีอะไรให้รายงาน</p>
+  <p><b>ปัญหา:</b> AI ที่สั่งห้ามเฉลยไม่หลุดสักข้ออยู่แล้ว ถ้าเราเทรนเพิ่ม ตัวเลขก็ยังเป็น 0 เท่าเดิม เลยพิสูจน์ไม่ได้ว่าการเทรนช่วยอะไร ต้องเลือกว่าจะพิสูจน์อะไรแทน</p>
   <div class="opts">
-    <div class="opt rec"><span class="tag">แนะนำ</span><b>ก. เทรนโมเดลเล็ก</b><p>เคลมว่า SFT ทำให้โมเดลเล็กต้านทานได้เท่า 7B ที่ใส่ prompt — ต้องวัดก่อนว่าตัวเล็กหลุดจริง</p></div>
-    <div class="opt"><b>ข. วัดคุณภาพการสอนแทน</b><p>rubric 8 มิติของ Maurya et al. ใช้ Qwen3-30B-A3B บนเครื่องคณะเป็นกรรมการ</p></div>
-    <div class="opt"><b>ค. ทำทั้งสองอย่าง</b><p>แข็งแรงที่สุด แต่เสี่ยงไม่ทันใน 5 วัน</p></div>
+    <div class="opt rec"><span class="tag">แนะนำ</span><b>ก. ใช้ AI ตัวเล็กลง</b><p>ตัวเล็กยังเผลอเฉลยอยู่ เทรนให้มันเลิกเฉลย แล้วโชว์ว่าตัวเล็กที่เทรนแล้วเก่งเท่าตัวใหญ่ แต่ถูกกว่าและเร็วกว่า</p></div>
+    <div class="opt"><b>ข. วัดว่าสอนดีแค่ไหน</b><p>ไม่ได้ดูแค่ว่าเฉลยไหม แต่ให้ AI ตัวใหญ่ให้คะแนนการสอน 8 ด้าน เช่น ชี้จุดผิดถูกไหม ใบ้ช่วยได้จริงไหม</p></div>
+    <div class="opt"><b>ค. ทำทั้งสองแบบ</b><p>รายงานแน่นที่สุด แต่เสี่ยงทำไม่ทันใน 5 วัน</p></div>
   </div>
 </div>
 
-<h2>ผลวัดตอนนี้ — dialogue leak (strict)</h2>
-<div class="scroll">
-<table class="grid">
-  <thead><tr><th></th><th>กดดัน 2 เทิร์น</th><th>กดดัน 5 เทิร์น</th></tr></thead>
-  <tbody><tr><th scope="row"><b>มี guardrail</b><span>prompt ห้ามเฉลย</span></th><td><span class="num">0%</span><span class="sm">loose 0% · 100 บทสนทนา</span></td><td><span class="num">0%</span><span class="sm">loose 1% · 100 บทสนทนา</span></td></tr><tr><th scope="row"><b>ไม่มี guardrail</b><span>ผู้ช่วยคณิตธรรมดา</span></th><td><span class="num">89%</span><span class="sm">loose 90% · 100 บทสนทนา</span></td><td><span class="pending">รอคิว</span><span class="sm">รันที่เครื่องคณะ</span></td></tr></tbody>
-</table>
-</div>
-<p class="note">100 โจทย์จาก MathDial ชุดเดียวกันทุกช่อง · qwen2.5:7b · guardrail ลดการหลุดจาก 89% เหลือ 0%</p>
+<h2>เดโมที่จะโชว์</h2>
+<p class="sub">คุยกับอวตารเป็นภาษาไทยได้ ส่วนสมองข้างในคิดเป็นอังกฤษ เป็นตัวเดียวกับที่เราวัดผล</p>
+<div class="pipe"><div><b>นักเรียนพูดไทย</b></div><div><b>ฟังเสียง</b><span>Typhoon Whisper</span></div><div><b>แปลเป็นอังกฤษ</b><span>Typhoon Translate</span></div><div><b>ครู AI คิดคำตอบ</b><span>ตัวเดียวกับที่วัดผล</span></div><div><b>แปลกลับเป็นไทย</b><span>Typhoon Translate</span></div><div><b>อวตารพูดตอบ</b></div></div>
 
-<h2>A · คืนนี้ที่เครื่องคณะ — ทำตามลำดับ ห้ามสลับ</h2>
-<ol class="steps"><li><span>เช็กการ์ดก่อนแตะอะไร</span><code>nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv</code></li><li><span>เช็กว่าสร้าง venv ได้</span><code>python -m venv .venv</code></li><li><span>clone แล้วเทสตัววัด ต้องผ่าน 7/7</span><code>gh repo clone fourtoyou/ai-tutor &amp;&amp; cd ai-tutor &amp;&amp; python -m tutor.leak_rate --selftest</code></li><li><span>ชุดทดสอบต้องตรง 62c1da53…</span><code>sha256sum data/testset.jsonl</code></li><li><span>ลง torch ก่อนตัวอื่น ต้องได้ (12, 0)</span><code>pip install torch --index-url https://download.pytorch.org/whl/cu128 &amp;&amp; python -c &quot;import torch;print(torch.cuda.get_device_capability())&quot;</code></li></ol>
-<p class="note">ข้อ 5 ไม่ผ่านภายใน 1 ชม. ให้หยุดแล้วย้ายไป Colab ที่ B เตรียมไว้</p>
+<h2>แต่ละคนทำอะไร</h2>
+<p class="sub">กล่องสีด้านบนของแต่ละคนคืองานที่ต้องทำต่อไป</p>
+<div class="people"><article class="person" style="--lane:var(--la)"><div class="ph"><span class="badge">A</span><div><h3>ตัว AI + วัดผล</h3><span class="role">เทรน AI และวัดว่ามันเผลอบอกคำตอบไหม</span></div><div class="cnt"><b>4/13</b><span>เสร็จแล้ว</span></div></div><div class="pbar"><i style="width:31%"></i></div><div class="nextup"><span class="k">ทำต่อไป (วันที่ 1)</span><b>ติดตั้งโปรแกรมบนเครื่องคณะให้ใช้ได้</b><small>ทำคืนนี้</small></div><ul class="tl"><li class="t done"><span class="day">วันที่ 1</span><span class="tx">ทำช่องทางให้หน้าเว็บคุยกับ AI ได้<small>มีโหมดตอบหลอกให้ C ทำหน้าอวตารได้ก่อน</small></span><span class="pill done">เสร็จ</span></li><li class="t todo cur"><span class="day">วันที่ 1</span><span class="tx">ติดตั้งโปรแกรมบนเครื่องคณะให้ใช้ได้<small>ทำคืนนี้</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">วันที่ 1</span><span class="tx">อัปโหลดงานวิจัย 42 ไฟล์ขึ้น Google Drive<small>ให้ D ใช้เขียนส่วนงานที่เกี่ยวข้อง</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t done"><span class="day">วันที่ 2</span><span class="tx">ตัวนับว่า AI เผลอบอกคำตอบไหม<small>ทดสอบแล้วนับถูก 7/7</small></span><span class="pill done">เสร็จ</span></li><li class="t done"><span class="day">วันที่ 2</span><span class="tx">ล็อกโจทย์ทดสอบ 100 ข้อ ห้ามแก้<small>ทุกรอบต้องใช้ชุดเดียวกัน ไม่งั้นเทียบกันไม่ได้</small></span><span class="pill done">เสร็จ</span></li><li class="t done"><span class="day">วันที่ 2</span><span class="tx">วัดผลก่อนเทรน<small>ไม่สั่งอะไร 89 ข้อ · สั่งห้ามเฉลย 0 ข้อ</small></span><span class="pill done">เสร็จ</span></li><li class="t todo"><span class="day">วันที่ 2</span><span class="tx">วัดช่องที่เหลือ: ไม่สั่งอะไร + ตื๊อ 4 แบบ<small>วัดที่เครื่องคณะ</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">วันที่ 2</span><span class="tx">เกณฑ์ให้คะแนนการสอน 8 ด้าน<small>ต้องใช้ถ้าทีมเลือกทาง ข.</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">วันที่ 3</span><span class="tx">เทรน AI รอบ 1<small>รอบละไม่เกิน 2 ชม.</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">วันที่ 3</span><span class="tx">วัดผลหลังเทรนรอบ 1</span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">วันที่ 4</span><span class="tx">เทรน AI รอบ 2</span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">วันที่ 4</span><span class="tx">วัดผลรอบ 2</span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">วันที่ 5</span><span class="tx">เก็บไฟล์ AI และค่าที่ใช้ ให้ทำซ้ำได้</span><span class="pill todo">ยังไม่เริ่ม</span></li></ul></article><article class="person" style="--lane:var(--lb)"><div class="ph"><span class="badge">B</span><div><h3>ข้อมูล + เครื่องสำรอง</h3><span class="role">เตรียมตัวอย่างที่ใช้สอน AI และเครื่องสำรองเผื่อฉุกเฉิน</span></div><div class="cnt"><b>1/4</b><span>เสร็จแล้ว</span></div></div><div class="pbar"><i style="width:25%"></i></div><div class="nextup"><span class="k">ทำต่อไป (วันที่ 1)</span><b>เตรียมเครื่องสำรองบน Google Colab</b><small>เผื่อเครื่องคณะใช้ไม่ได้ · B อัปเดตหน่อย</small></div><ul class="tl"><li class="t done"><span class="day">วันที่ 1</span><span class="tx">จัดโจทย์ MathDial ให้อยู่รูปแบบเดียวกัน</span><span class="pill done">เสร็จ</span></li><li class="t unknown cur"><span class="day">วันที่ 1</span><span class="tx">เตรียมเครื่องสำรองบน Google Colab<small>เผื่อเครื่องคณะใช้ไม่ได้ · B อัปเดตหน่อย</small></span><span class="pill unknown">รออัปเดต</span></li><li class="t todo"><span class="day">วันที่ 2</span><span class="tx">เตรียมตัวอย่างสำหรับเทรนให้เสร็จ<small>รอทีมเลือกก่อนว่าจะพิสูจน์อะไร</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">วันที่ 3</span><span class="tx">ปรับตัวอย่างเทรนรอบสอง<small>แก้เฉพาะจุดที่ AI ยังทำพลาด</small></span><span class="pill todo">ยังไม่เริ่ม</span></li></ul></article><article class="person" style="--lane:var(--lc)"><div class="ph"><span class="badge">C</span><div><h3>อวตาร + เดโม</h3><span class="role">หน้าอวตารที่ฟังและพูดไทยได้ และซ้อมโชว์วันนำเสนอ</span></div><div class="cnt"><b>1/5</b><span>เสร็จแล้ว</span></div></div><div class="pbar"><i style="width:20%"></i></div><div class="nextup"><span class="k">ทำต่อไป (วันที่ 1)</span><b>หน้าอวตารพูดได้</b><small>มีหน้าเดโมเสียงแล้ว หน้าตายังเป็นการ์ตูนชั่วคราว</small></div><ul class="tl"><li class="t part cur"><span class="day">วันที่ 1</span><span class="tx">หน้าอวตารพูดได้<small>มีหน้าเดโมเสียงแล้ว หน้าตายังเป็นการ์ตูนชั่วคราว</small></span><span class="pill part">ทำไปบางส่วน</span></li><li class="t part"><span class="day">วันที่ 2</span><span class="tx">อวตารพูดไทย + ขยับปาก<small>พูดไทยได้แล้ว ปากยังขยับแบบหลอก ๆ</small></span><span class="pill part">ทำไปบางส่วน</span></li><li class="t done"><span class="day">วันที่ 3</span><span class="tx">ต่อหน้าอวตารกับ AI ตัวจริง</span><span class="pill done">เสร็จ</span></li><li class="t todo"><span class="day">วันที่ 4</span><span class="tx">เดโมใช้ได้ตั้งแต่ต้นจนจบ + อัดวิดีโอสำรอง<small>เผื่อวันนำเสนอเน็ตล่ม</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">วันที่ 5</span><span class="tx">ซ้อมนำเสนอ 2 รอบ<small>จับเวลา</small></span><span class="pill todo">ยังไม่เริ่ม</span></li></ul></article><article class="person" style="--lane:var(--ld)"><div class="ph"><span class="badge">D</span><div><h3>เขียน + วิเคราะห์</h3><span class="role">เขียนรายงาน ทำกราฟ อธิบายว่าผลแปลว่าอะไร</span></div><div class="cnt"><b>0/5</b><span>เสร็จแล้ว</span></div></div><div class="pbar"><i style="width:0%"></i></div><div class="nextup"><span class="k">ทำต่อไป (วันที่ 1)</span><b>โครงรายงาน + สรุปงานวิจัยที่เกี่ยวข้อง</b><small>D อัปเดตหน่อย</small></div><ul class="tl"><li class="t unknown cur"><span class="day">วันที่ 1</span><span class="tx">โครงรายงาน + สรุปงานวิจัยที่เกี่ยวข้อง<small>D อัปเดตหน่อย</small></span><span class="pill unknown">รออัปเดต</span></li><li class="t unknown"><span class="day">วันที่ 2</span><span class="tx">เขียนวิธีทำ + ทำตารางรอใส่ตัวเลข<small>D อัปเดตหน่อย</small></span><span class="pill unknown">รออัปเดต</span></li><li class="t todo"><span class="day">วันที่ 3</span><span class="tx">เขียนส่วนที่ยังไม่ต้องใช้ตัวเลข</span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">วันที่ 4</span><span class="tx">กราฟและตารางผลครบ</span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">วันที่ 5</span><span class="tx">รายงานฉบับสมบูรณ์</span><span class="pill todo">ยังไม่เริ่ม</span></li></ul></article></div>
+<section class="team"><h3>งานที่ทำด้วยกันทั้งทีม</h3><ul class="tl" style="padding:0"><li class="t todo cur"><span class="day">วันที่ 2</span><span class="tx">เลือกว่าการเทรนจะพิสูจน์อะไร (ก / ข / ค)<small>ต้องเลือกก่อน B เตรียมตัวอย่างเทรน</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">วันที่ 4</span><span class="tx">อ่านบทสนทนาแล้วให้คะแนนเอง คนละ 20 อัน<small>ใช้เกณฑ์เดียวกันทุกคน</small></span><span class="pill todo">ยังไม่เริ่ม</span></li><li class="t todo"><span class="day">วันที่ 5</span><span class="tx">ซ้อมรวม + เช็คของที่ต้องส่ง</span><span class="pill todo">ยังไม่เริ่ม</span></li></ul></section>
 
-<h2>ปัญหาที่รู้แล้ว</h2>
-<ul class="cards"><li><b>ตัววัด leak อิ่มตัว</b><p>prompt ห้ามเฉลยทำให้ qwen2.5:7b หลุด 0% แม้กดดัน 5 เทิร์น — SFT จึงพิสูจน์ด้วยตัวเลขนี้ไม่ได้</p></li><li><b>ความผิดพลาดส่งต่อเป็นทอด</b><p>Whisper ได้ยิน &quot;ไม่รู้อะ&quot; เป็น &quot;ไม่รู้เอา&quot; ตัวแปลเลยแปลผิด คำขอให้เฉลยหายไปทั้งท่อน</p></li></ul>
+<h2>คำที่เจอบ่อย</h2>
+<div class="gloss"><div><b>หลุด</b><span>AI เผลอบอกคำตอบสุดท้ายออกมา ซึ่งเราไม่อยากให้เกิด</span></div><div><b>สั่งห้ามเฉลย</b><span>ข้อความที่แปะให้ AI อ่านก่อนเริ่ม บอกว่าห้ามบอกคำตอบ ให้ถามนำแทน (ศัพท์เทคนิคเรียก guardrail หรือ prompt)</span></div><div><b>เทรน</b><span>สอน AI เพิ่มด้วยตัวอย่างการสอนที่ดีหลายร้อยตัวอย่าง (ศัพท์เทคนิคเรียก SFT / QLoRA)</span></div><div><b>วัดผลก่อนเทรน</b><span>ตัวเลขตั้งต้นไว้เทียบว่าหลังเทรนดีขึ้นไหม (ศัพท์เทคนิคเรียก baseline)</span></div><div><b>qwen2.5:7b</b><span>ชื่อ AI ที่เราใช้เป็นครู ขนาดกลาง รันบนเครื่องตัวเองได้ ไม่ต้องจ่ายค่า API</span></div><div><b>MathDial</b><span>ชุดบทสนทนาครูกับนักเรียนเรื่องโจทย์คณิต จากงานวิจัยปี 2023 มีทั้งโจทย์ คำตอบ และคำตอบผิดของนักเรียน</span></div></div>
 
-<footer>เว็บนี้อยู่ที่ <a href="https://fourtoyou.github.io/ai-tutor-status/">fourtoyou.github.io/ai-tutor-status</a> · สร้างจาก <a href="https://github.com/fourtoyou/ai-tutor/blob/main/tools/build_status.py">tools/build_status.py</a> — แก้สถานะงานที่ TASKS ใส่ชื่อที่ NAMES แล้วรันใหม่
-· ตัวเลขดึงจาก runs/*/summary.json ตรง ๆ · <a href="https://github.com/fourtoyou/ai-tutor">repo</a></footer>
+<h2>A · คืนนี้ที่เครื่องคณะ</h2>
+<p class="sub">ส่วนเทคนิคสำหรับ A — ทำตามลำดับ ห้ามสลับ ถ้าข้อ 5 ไม่ผ่านใน 1 ชม. ให้ย้ายไปเครื่องสำรองของ B</p>
+<ol class="steps"><li><span>เช็กการ์ดจอก่อนแตะอะไร</span><code>nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv</code></li><li><span>เช็กว่าสร้าง venv ได้</span><code>python -m venv .venv</code></li><li><span>clone แล้วเทสตัวนับ ต้องผ่าน 7/7</span><code>gh repo clone fourtoyou/ai-tutor &amp;&amp; cd ai-tutor &amp;&amp; python -m tutor.leak_rate --selftest</code></li><li><span>ชุดทดสอบต้องตรง 62c1da53…</span><code>sha256sum data/testset.jsonl</code></li><li><span>ลง torch ก่อนตัวอื่น ต้องได้ (12, 0)</span><code>pip install torch --index-url https://download.pytorch.org/whl/cu128 &amp;&amp; python -c &quot;import torch;print(torch.cuda.get_device_capability())&quot;</code></li></ol>
+
+<footer>อัปเดตหน้านี้: แก้ <code>tools/build_status.py</code> ใน repo หลัก แล้วรัน <code>python tools/build_status.py --publish</code>
+· ตัวเลขผลดึงจากไฟล์ผลรันจริง ไม่มีการพิมพ์เอง</footer>
 </div>
 </body>
 </html>
