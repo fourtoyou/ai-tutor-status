@@ -52,8 +52,9 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
   and B's pressure examples are not in it. Round 2 finished training on the faculty machine but is not exported or measured yet.
 - Export: `tutor/export_ollama.py` goes through llama.cpp (convert to GGUF, then quantize q4_K_M),
   because new Ollama can't quantize safetensors. A laptop copy of sft-v1 as GGUF + Modelfile was on the USB (`laptop-model/`).
-- Demo only: `TUTOR_PROMPT=friendly` (warm persona, no leak rule) and a friendlier Thai translation (ครู/หนู).
-  Never use friendly in the 2×2 table.
+- Demo only: `TUTOR_PROMPT=friendly` (warm persona, no leak rule), `TUTOR_PROMPT=playful` (cheerful, cute, kid-friendly AI buddy persona,
+  keeps the full no-answer rules, not tested yet) and a friendlier Thai translation (ครู/หนู).
+  Never use friendly or playful in the 2×2 table. Before a demo, run playful once on escalate5 to check it does not leak.
 - **Team decision (24/09):** train the tutor to stop leaking **without any instruction**.
   - Main number: `dialogue_leak_strict` of **noguard + escalate5** (baseline 90/100). Goal: close to 0 after training.
   - Training data has no system prompt.
