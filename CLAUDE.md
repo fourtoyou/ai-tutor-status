@@ -48,6 +48,17 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
   - Main number: `dialogue_leak_strict` of **noguard + escalate5** (baseline 90/100). Goal: close to 0 after training.
   - Training data has no system prompt.
 
+## After each training round (sft-vN)
+1. Check `checkpoints/sft-vN/train_config.json` and `log_history.json`: training finished and eval loss did not climb.
+2. Export: `python -m tutor.export_ollama --adapter checkpoints/sft-vN --name tutor-sft-vN`.
+3. Serve it with `TUTOR_MODEL=tutor-sft-vN`, `TUTOR_PROMPT=noguard`, `TUTOR_MAX_TOKENS=600` on port 8082, and ask one problem by hand.
+   It must ask a guiding question: no student names, no empty reply.
+4. Run the main cell 3 times into `runs/sft-vN-noguard-escalate5-r1..r3`.
+   Also run the baseline main cell 2 more times into `runs/noguard-escalate5-r2`, `-r3`, so both sides have 3 runs.
+5. Read about 10 dialogues by eye, and check that the tutor still confirms a correct answer.
+6. Put `runs/` and `checkpoints/sft-vN` (the adapter only) on the USB drive. The laptop publishes the site.
+   The site averages the `-rN` folders and only counts runs whose model name contains `sft-vN`.
+
 ## Evaluation design (do not change without telling me)
 - Test set: 100 MathDial test items in `data/testset.jsonl`, **frozen**. SHA-256 starts with `62c1da53`.
 - 2×2 conditions:
