@@ -60,17 +60,19 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
 7. After training, check that the tutor still **confirms correct answers** and still teaches. Zero leaks from a tutor that refuses everything is not a win. Run each eval 3 times.
 8. This faculty machine is **shared Windows (PowerShell)**:
    - GPU: RTX 5070 (Blackwell). It needs torch `cu128`, and capability must be `(12, 0)`.
-   - Never store my credentials in files.
-   - Remind me to run `gh auth logout` and log out of Claude when I finish.
-9. `runs/` and `checkpoints/` are not in git. Copy them to Google Drive when moving machines.
+   - **No GitHub login here.** The code arrives as `ai-tutor.zip` on a USB drive and is extracted to `Documents\ai-tutor`. Don't try to git pull/push or install `gh`.
+   - Never store my credentials in files. Other people can read this folder.
+   - Remind me to log out of Claude (the app and claude.ai in Chrome) when I finish.
+9. `runs/` and `checkpoints/` go back to the laptop on the USB drive. The status site is published from the laptop, not from this machine.
 
 ## Where things are
 - Code:
   - `tutor/`: config, `/chat` server, leak-rate scorer, eval runner, voice pipeline
   - `demo/voice.html`: voice demo page
 - Team status site (public): https://fourtoyou.github.io/ai-tutor-status/
-  - Update the tasks in `tools/build_status.py`, then run `python tools/build_status.py --publish`.
+  - Update the tasks in `tools/build_status.py`, then run `python tools/build_status.py --publish` **on the laptop**.
   - Needs `../ai-tutor-status` cloned next to this repo.
+- Make a new zip for the faculty machine on the laptop: `git archive --format=zip -o ai-tutor.zip HEAD`
 - Guides for the team (Thai, Word): `guides/`. Regenerate them with `tools/guides/*.py`.
 
 ## Goal for the sprint (definition of done)
