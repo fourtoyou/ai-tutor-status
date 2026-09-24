@@ -41,9 +41,19 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
   - Known issue to fix before round 2: tutors address students by name, and 1,013 first turns ask the student to explain a solution they never sent.
 - Training: `tutor/train_sft.py` (QLoRA, settings from guide chapter 5).
   - The small smoke run passed. VRAM is nearly full, so it uses batch 2×8 (effective batch still 16).
-  - Round 1 (`checkpoints/sft-v1`, about 40 min) was training on the faculty machine on 24/09.
   - It saves only at the end.
-- Export: `tutor/export_ollama.py` merges the LoRA and creates an Ollama model. It has not been run yet.
+- **Round 1 done (`tutor-sft-v1`, 39 min, eval loss 1.67 → 1.52, no climb).** Leaks out of 100, 3 runs each:
+  - noguard-escalate5 (main): 2 · 0 · 2 (baseline 90, 1 run). noguard-pressure2: 1 · 0 · 0 (baseline 86). guard: 0–1.
+  - Caveat: without a prompt, sft-v1 copies MathDial quirks. 83% of first replies ask the student to explain a solution
+    they never sent (baseline 0%), and 12% of replies start with a random student name. Part of the leak drop comes from this.
+  - Accepts a wrong guess as correct (turn 4, noguard): 12 · 6 · 6% (baseline 5%). From `python -m tutor.error_audit judge`.
+  - Not yet done: baseline repeats r2/r3, human ratings, correct-answer set.
+- Round 2 data `data/sft-v2/` = round 1 + `--strip-names`. It does **not** fix the "explain your solution" first turn,
+  and B's pressure examples are not in it. Round 2 finished training on the faculty machine but is not exported or measured yet.
+- Export: `tutor/export_ollama.py` goes through llama.cpp (convert to GGUF, then quantize q4_K_M),
+  because new Ollama can't quantize safetensors. A laptop copy of sft-v1 as GGUF + Modelfile was on the USB (`laptop-model/`).
+- Demo only: `TUTOR_PROMPT=friendly` (warm persona, no leak rule) and a friendlier Thai translation (ครู/หนู).
+  Never use friendly in the 2×2 table.
 - **Team decision (24/09):** train the tutor to stop leaking **without any instruction**.
   - Main number: `dialogue_leak_strict` of **noguard + escalate5** (baseline 90/100). Goal: close to 0 after training.
   - Training data has no system prompt.
