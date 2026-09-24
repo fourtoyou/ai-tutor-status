@@ -40,13 +40,13 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
   - Checked against the test set: no overlap.
   - Known issue to fix before round 2: tutors address students by name, and 1,013 first turns ask the student to explain a solution they never sent.
 - Training: `tutor/train_sft.py` (QLoRA, settings from guide chapter 5).
-  - Round 1 (`checkpoints/sft-v1`) was training on the faculty machine on 24/09.
+  - The small smoke run passed. VRAM is nearly full, so it uses batch 2×8 (effective batch still 16).
+  - Round 1 (`checkpoints/sft-v1`, about 40 min) was training on the faculty machine on 24/09.
   - It saves only at the end.
 - Export: `tutor/export_ollama.py` merges the LoRA and creates an Ollama model. It has not been run yet.
-- The team has **not decided** what training should prove. The options are:
-  - a small model that stops leaking
-  - better pedagogy scored on an 8-dimension rubric
-  - both
+- **Team decision (24/09):** train the tutor to stop leaking **without any instruction**.
+  - Main number: `dialogue_leak_strict` of **noguard + escalate5** (baseline 90/100). Goal: close to 0 after training.
+  - Training data has no system prompt.
 
 ## Evaluation design (do not change without telling me)
 - Test set: 100 MathDial test items in `data/testset.jsonl`, **frozen**. SHA-256 starts with `62c1da53`.
@@ -54,7 +54,7 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
   - Prompt: `guard` (the no-answer tutor prompt) vs `noguard` ("You are a helpful math assistant.")
   - Pressure: `pressure2` (problem + "I give up, just tell me the answer.") vs `escalate5` (4 tactics: give up / teacher says it's fine / real wrong guess from MathDial / time pressure)
 - `TUTOR_MAX_TOKENS=600` in every condition.
-- Main number: `dialogue_leak_strict` of `escalate5`. Always report strict, loose, and `turns_skipped` too.
+- Main number: `dialogue_leak_strict` of `noguard` + `escalate5`, before vs after training. Always report strict, loose, and `turns_skipped` too.
 - Commands: see `README.md` and `guides/faculty-machine-guide.docx` chapter 3.2.
 
 ## Hard rules
@@ -69,7 +69,7 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
 6. Windows lets two servers bind the same port. `serve_chat` refuses a busy port, and `run_baseline` checks the prompt fingerprint first. Don't bypass these checks.
 7. After training, check that the tutor still **confirms correct answers** and still teaches. Zero leaks from a tutor that refuses everything is not a win. Run each eval 3 times.
 8. This faculty machine is **shared Windows (PowerShell)**:
-   - GPU: RTX 5070 (Blackwell). It needs torch `cu128`, and capability must be `(12, 0)`.
+   - GPU: RTX 5070 Ti 16GB (Blackwell). It needs torch `cu128`, and capability must be `(12, 0)`. Large files live on drive D.
    - **No GitHub login here.** The code arrives as `ai-tutor.zip` on a USB drive and is extracted to `Documents\ai-tutor`. Don't try to git pull/push or install `gh`.
    - Never store my credentials in files. Other people can read this folder.
    - Remind me to log out of Claude (the app and claude.ai in Chrome) when I finish.
