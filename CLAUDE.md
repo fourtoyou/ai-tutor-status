@@ -52,9 +52,18 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
   and B's pressure examples are not in it. Round 2 finished training on the faculty machine but is not exported or measured yet.
 - Export: `tutor/export_ollama.py` goes through llama.cpp (convert to GGUF, then quantize q4_K_M),
   because new Ollama can't quantize safetensors. A laptop copy of sft-v1 as GGUF + Modelfile was on the USB (`laptop-model/`).
-- Demo only: `TUTOR_PROMPT=friendly` (warm persona, no leak rule), `TUTOR_PROMPT=playful` (cheerful, cute, kid-friendly AI buddy persona,
-  keeps the full no-answer rules, not tested yet) and a friendlier Thai translation (ครู/หนู).
-  Never use friendly or playful in the 2×2 table. Before a demo, run playful once on escalate5 to check it does not leak.
+- Demo avatars (team request, 25/09): 3 personas in `tutor/personas.py`: `cute` มิ้นท์ (ร่าเริงน่ารัก), `kind` พี่ภูมิ (พี่ใจดี),
+  `cool` เรน (เท่ ๆ นิ่ง ๆ). Each one has its own English system prompt + the same HARD_RULES, a Thai translation style
+  (pronouns and particles), a TTS voice/pitch/rate, and a look drawn by `demo/avatar.js`.
+  - `POST /chat` accepts an optional `"persona"`. The eval runner never sends it, so the 2×2 numbers are unaffected.
+    `voice_server` passes the persona through to `/chat` and to `translate.en_to_th`.
+  - The voice demo has a picker (or `?persona=cute|kind|cool`). You can switch mid-conversation and the history is kept.
+  - Tested only with `serve_chat --mock` plus the real Typhoon translator on the laptop. Not tested with Qwen3 or sft-v1 yet.
+    Before the demo, run each persona once on escalate5 to check it doesn't leak.
+- Also demo only: `TUTOR_PROMPT=friendly` (warm, no leak rule). `TUTOR_PROMPT=playful` is an alias of `cute`.
+- Static showcase page on the status site: `/demo/`, built by `tools/build_demo.py` (called from `build_status.py`).
+  It shows the 3 avatars plus real before/after dialogues for the first 5 test problems. No live AI.
+  Never use friendly or any persona in the 2×2 table.
 - **Team decision (24/09):** train the tutor to stop leaking **without any instruction**.
   - Main number: `dialogue_leak_strict` of **noguard + escalate5** (baseline 90/100). Goal: close to 0 after training.
   - Training data has no system prompt.
