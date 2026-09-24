@@ -95,14 +95,19 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
    - **No GitHub login here.** The code arrives as `ai-tutor.zip` on a USB drive and is extracted to `Documents\ai-tutor`. Don't try to git pull/push or install `gh`.
    - Never store my credentials in files. Other people can read this folder.
    - Remind me to log out of Claude (the app and claude.ai in Chrome) when I finish.
-9. `runs/` and `checkpoints/` go back to the laptop on the USB drive. The status site is published from the laptop, not from this machine.
+9. `runs/` and `checkpoints/` go back to the laptop on the USB drive.
+   The status site can be published from this machine through a **deploy key** that can write only to `ai-tutor-status`
+   (setup: faculty guide 3.3; key at `D:/ai-tutor-work/status_key`, repo cloned to `Documents/ai-tutor-status`).
+   Publish only from the machine that has the newest `runs/`, or results vanish from the site.
+   `publish()` fetches and resets the site repo first, so pushes from two machines don't conflict.
+   If the site's task list is edited here, bring `tools/build_status.py` back on the USB so the laptop can commit it.
 
 ## Where things are
 - Code:
   - `tutor/`: config, `/chat` server, leak-rate scorer, eval runner, voice pipeline
   - `demo/voice.html`: voice demo page
 - Team status site (public): https://fourtoyou.github.io/ai-tutor-status/
-  - Update the tasks in `tools/build_status.py`, then run `python tools/build_status.py --publish` **on the laptop**.
+  - Update the tasks in `tools/build_status.py`, then run `python tools/build_status.py --publish` (laptop, or faculty machine with the deploy key).
   - Needs `../ai-tutor-status` cloned next to this repo.
 - Make a new zip for the faculty machine on the laptop: `git archive --format=zip -o ai-tutor.zip HEAD`
 - Guides for the team (Thai, Word): `guides/`. Regenerate them with `tools/guides/*.py`.
