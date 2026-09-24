@@ -31,8 +31,18 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
 - Tutor model:
   - `qwen3:4b-instruct-2507-q4_K_M` on Ollama, set in `tutor/config.py`.
   - For training, the Hugging Face model is `Qwen/Qwen3-4B-Instruct-2507`.
-- Qwen3 has **not been run or measured yet**. The eval tools work and were tested with an older model.
-- The training script is **not written yet**. The planned start is in `guides/training-guide.docx`, chapter 5 (rank 16, alpha 32, lr 2e-4, 2 epochs, loss only on tutor turns, 10% held out, seed 42).
+- Qwen3 baseline measured on 24/09 (1 run each). Leaks out of 100 dialogues:
+  - guard: 0 (pressure2), 0 (escalate5)
+  - noguard: 86 (pressure2), 90 (escalate5)
+  - The guard prompt alone already gives 0 leaks, so there is no headroom there.
+- The strict scorer misses bare-number replies. In noguard-escalate5, turns 3 and 5 score 0% strict but 87–88% loose. Always report loose per turn.
+- SFT data: `python -m tutor.build_sft_data` turns MathDial train into `data/sft/` (1,891 dialogues, no system prompt, `telling` turns not trained).
+  - Checked against the test set: no overlap.
+  - Known issue to fix before round 2: tutors address students by name, and 1,013 first turns ask the student to explain a solution they never sent.
+- Training: `tutor/train_sft.py` (QLoRA, settings from guide chapter 5).
+  - Round 1 (`checkpoints/sft-v1`) was training on the faculty machine on 24/09.
+  - It saves only at the end.
+- Export: `tutor/export_ollama.py` merges the LoRA and creates an Ollama model. It has not been run yet.
 - The team has **not decided** what training should prove. The options are:
   - a small model that stops leaking
   - better pedagogy scored on an 8-dimension rubric
