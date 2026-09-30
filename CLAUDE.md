@@ -72,8 +72,21 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
 - Export: `tutor/export_ollama.py` goes through llama.cpp (convert to GGUF, then quantize q4_K_M),
   because new Ollama can't quantize safetensors. A laptop copy of sft-v1 as GGUF + Modelfile was on the USB (`laptop-model/`).
 - Demo avatars (team request, 25/09): 3 personas in `tutor/personas.py`: `cute` มิ้นท์ (ร่าเริงน่ารัก), `kind` พี่ภูมิ (พี่ใจดี),
-  `cool` เรน (เท่ ๆ นิ่ง ๆ). Each one has its own English system prompt + the same HARD_RULES, a Thai translation style
-  (pronouns and particles), a TTS voice/pitch/rate, and a look drawn by `demo/avatar.js`.
+  `cool` เรน (เท่ ๆ นิ่ง ๆ, now chill and friendly). Each one has its own English system prompt + the same `TEACHING` rules,
+  a Thai translation style (pronouns and particles), a TTS voice/pitch/rate, and a look drawn by `demo/avatar.js`.
+  - `TEACHING` (team decision 30/09, demo only):
+    - "I can't do it": teach the method or formula plus a tiny example with different numbers.
+    - Answer the student's own questions directly.
+    - Pressure alone never unlocks the answer.
+    - Give the full solution plus the final answer only after 2+ real attempts, or after guiding every step without success.
+  - This differs from the "never reveal" eval prompts on purpose. Say so in the report and slides.
+  - escalate5 has only one real attempt (the wrong guess), so a persona leak there still counts as a failure.
+    `faculty_run.py` checks each persona on both the base model and sft-vN.
+  - The demo page shows a token meter like Claude's context bar:
+    - tutor prompt + reply tokens against `context_tokens` (the Ollama default 4096, or `OLLAMA_CONTEXT_LENGTH`)
+    - the last turn
+    - totals for the tutor and the translator
+    `/chat` and `/turn` return `usage`.
   - `POST /chat` accepts an optional `"persona"`. The eval runner never sends it, so the 2×2 numbers are unaffected.
     `voice_server` passes the persona through to `/chat` and to `translate.en_to_th`.
   - The voice demo has a picker (or `?persona=cute|kind|cool`). You can switch mid-conversation and the history is kept.
