@@ -50,6 +50,25 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
   - Not yet done: baseline repeats r2/r3, human ratings, correct-answer set.
 - Round 2 data `data/sft-v2/` = round 1 + `--strip-names`. It does **not** fix the "explain your solution" first turn,
   and B's pressure examples are not in it. Round 2 finished training on the faculty machine but is not exported or measured yet.
+- Round 3 data `data/sft-v3/` = round 2 + `--cut-ask-work` (built 30/09 on the laptop, not trained).
+  - It drops the first tutor turn when it asks about work the student never sent (1,427 dialogues).
+    The student's explanation then joins the problem as the first message.
+  - Result: 1,877 dialogues. First turns asking for unsent work after a problem-only message go from 1,340 to 1.
+  - Risk: part of sft-v1's leak drop came from this quirk, so leaks may rise. Measure before claiming anything.
+- Correct-answer check `data/answer_check.jsonl` (sha 2bad2c0d, `python -m tutor.build_testset --answer-check`):
+  - The same 100 test problems × {correct, wrong real MathDial guess} × {bare number, full worked solution} = 400 rows.
+  - Run it with `python -m tutor.error_audit correct --endpoint … --name <model>-noguard`.
+  - It reports accept-correct % (want high) and accept-wrong % (want low). The classifier is regex, so read samples by eye.
+  - Not run yet.
+- `tools/faculty_run.py` runs everything after a training round in one command, and it can resume:
+  - export, smoke test, 12 sft runs, baseline r2/r3, answer check (base / sft-v1 / sft-vN), 3 personas on escalate5, judge, copy to USB.
+  - `--round 3 --train` also builds the data and trains first.
+  - Tested end to end with `--mock` only, not yet with real models.
+- Human ratings: `guides/rating-sheet.xlsx` (built by `tools/build_rating.py`, key in `ratings/key.json`).
+  - 20 problems × before/after = 40 dialogues. Each rater gets 20 (10 before, 10 after), and every dialogue has 2 raters.
+  - 8 dimensions adapted from Maurya et al. (NAACL 2025), scored 1–3.
+  - Score the filled files with `python tools/build_rating.py --score`.
+- Report figures and tables: `python tools/build_figures.py` writes `report/` (4 PNGs, `results.xlsx` with charts embedded, and `README.md` with caveats).
 - Export: `tutor/export_ollama.py` goes through llama.cpp (convert to GGUF, then quantize q4_K_M),
   because new Ollama can't quantize safetensors. A laptop copy of sft-v1 as GGUF + Modelfile was on the USB (`laptop-model/`).
 - Demo avatars (team request, 25/09): 3 personas in `tutor/personas.py`: `cute` มิ้นท์ (ร่าเริงน่ารัก), `kind` พี่ภูมิ (พี่ใจดี),
@@ -69,6 +88,7 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
   - Training data has no system prompt.
 
 ## After each training round (sft-vN)
+On the faculty machine, `python tools/faculty_run.py --round N` does steps 1–6 below. The steps are here so you can check its work.
 1. Check `checkpoints/sft-vN/train_config.json` and `log_history.json`: training finished and eval loss did not climb.
 2. Export: `python -m tutor.export_ollama --adapter checkpoints/sft-vN --name tutor-sft-vN`.
 3. Serve it with `TUTOR_MODEL=tutor-sft-vN`, `TUTOR_PROMPT=noguard`, `TUTOR_MAX_TOKENS=600` on port 8082, and ask one problem by hand.
