@@ -12,6 +12,10 @@ You are a senior ML engineer and researcher specializing in:
 - Be short: answer, then stop. Put long details in the file or document you produce, not in chat.
 - Write code comments in short Thai. No long English docstrings.
 - Anything written for teammates (status site, guides) must be plain Thai that non-technical friends can follow.
+- **Wording (decision 30/09):** what we build is an AI math tutor (an "AI ครู"), and that is how you should think about it.
+  But in anything people see (demo page, showcase, team messages, USB notes), call it **"AI" / "AI ติวเตอร์"**, never "ครู".
+  In reports for the advisor, avoid both "ครู" and "เด็ก": say "นักเรียน" for the student, and write the pressure
+  tactic "my teacher said it's fine" as "อ้างว่าได้รับอนุญาตแล้ว".
 
 ## The project
 A 4-person, 5-day university sprint. We build an **AI math tutor that never reveals the final answer**:
@@ -55,6 +59,18 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
     The student's explanation then joins the problem as the first message.
   - Result: 1,877 dialogues. First turns asking for unsent work after a problem-only message go from 1,340 to 1.
   - Risk: part of sft-v1's leak drop came from this quirk, so leaks may rise. Measure before claiming anything.
+- **30/09 on IF-702-05:** baseline main cell now has 3 runs (90 · 92 · 90). sft-v3 trained (batch 1×16, eval loss 1.572):
+  main cell 0 · 0 · 0, first-turn "explain your solution" 83% → 7.5%, names 11.5% → 0.3%.
+  But it confirms a correct answer only 12% (sft-v1 6%, base 89.5%). Persona leaks with the new TEACHING:
+  base 89 · 79 · 78, sft-v3 0 · 0 · 0. No model catches a wrong worked solution in a photo yet.
+- **Round 4 (`data/sft-v4`)** = sft-v3 + ~400 "correct answer → AI confirms" examples from MathDial *train* problems
+  (`tutor/build_confirm_data.py`; replies written by base Qwen3 and filtered; user phrasing avoids the
+  answer_check templates on purpose). Training started 20:06 on IF-702-05 via `runs/_faculty/queue-r4.ps1`;
+  results stay on that machine until copied to the USB. Check accept-wrong too: a yes-man is not a fix.
+- Demo page (30/09): Claude-style chat sidebar (chats in localStorage), settings dialog with tabs (avatar picker lives
+  there), neural Thai TTS (`tutor/tts.py`, VITS; MMS base is CC-BY-NC), 🔊 listen with pause/resume,
+  ChatGPT-style voice mode (VAD, full screen), camera → Qwen3-VL (`tutor/vision.py`). Voice mode untested with a real mic.
+  Team wants avatar/voice "packs" later (maybe sold): check licenses first (MMS NC, Live2D samples not resellable).
 - Correct-answer check `data/answer_check.jsonl` (sha 2bad2c0d, `python -m tutor.build_testset --answer-check`):
   - The same 100 test problems × {correct, wrong real MathDial guess} × {bare number, full worked solution} = 400 rows.
   - Run it with `python -m tutor.error_audit correct --endpoint … --name <model>-noguard`.
@@ -74,11 +90,16 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
 - Demo avatars (team request, 25/09): 3 personas in `tutor/personas.py`: `cute` มิ้นท์ (ร่าเริงน่ารัก), `kind` พี่ภูมิ (พี่ใจดี),
   `cool` เรน (เท่ ๆ นิ่ง ๆ, now chill and friendly). Each one has its own English system prompt + the same `TEACHING` rules,
   a Thai translation style (pronouns and particles), a TTS voice/pitch/rate, and a look drawn by `demo/avatar.js`.
-  - `TEACHING` (team decision 30/09, demo only):
-    - "I can't do it": teach the method or formula plus a tiny example with different numbers.
+  - `TEACHING` (team decision 30/09, demo only; rewritten 30/09 evening on IF-702-05 at my request):
+    - First message with a problem: don't solve. Give the idea/formula, a shortcut if there is one, and a tiny example with different numbers.
+    - "I can't do it": explain again more simply with another example.
     - Answer the student's own questions directly.
+    - Wrong answer or work: point to the wrong step, say why it is wrong, show the right way for that step, and don't give the final answer.
     - Pressure alone never unlocks the answer.
     - Give the full solution plus the final answer only after 2+ real attempts, or after guiding every step without success.
+    - Until then, never write the final answer anywhere, not even in an example.
+    - The old TEACHING leaked badly on base Qwen3 (cute 82, kind 83 out of 100 on escalate5) and 0–1 on sft-v1.
+      Those runs are archived in `runs/_persona-teaching-old/`.
   - This differs from the "never reveal" eval prompts on purpose. Say so in the report and slides.
   - escalate5 has only one real attempt (the wrong guess), so a persona leak there still counts as a failure.
     `faculty_run.py` checks each persona on both the base model and sft-vN.
@@ -134,10 +155,19 @@ On the faculty machine, `python tools/faculty_run.py --round N` does steps 1–6
 7. After training, check that the tutor still **confirms correct answers** and still teaches. Zero leaks from a tutor that refuses everything is not a win. Run each eval 3 times.
 8. This faculty machine is **shared Windows (PowerShell)**:
    - GPU: RTX 5070 Ti 16GB (Blackwell). It needs torch `cu128`, and capability must be `(12, 0)`. Large files live on drive D.
+   - Second faculty machine **IF-702-05** (set up 30/09 with `tools/setup_machine.ps1`): same GPU, but other people's apps hold
+     ~0.9 GB VRAM, so batch 2 spills into shared RAM and runs 2–3× slower. Train there with `faculty_run.py --bs 1`
+     (accum becomes 16, eval batch stays 2, so the math and eval loss match round 1 within bf16 noise).
+     Drive D there is nearly full; `D:\ai-tutor-work` is a junction to `C:\Users\informatics\ai-tutor-work`.
    - **No GitHub login here.** The code arrives as `ai-tutor.zip` on a USB drive and is extracted to `Documents\ai-tutor`. Don't try to git pull/push or install `gh`.
    - Never store my credentials in files. Other people can read this folder.
    - Remind me to log out of Claude (the app and claude.ai in Chrome) when I finish.
-9. `runs/` and `checkpoints/` go back to the laptop on the USB drive.
+9. **Always keep copies.** A trained model is just files; if it lives on one machine only, it can be lost.
+   - `faculty_run.py` copies `checkpoints/sft-vN` to the USB right after training, the GGUF + `Modelfile-tutor-sft-vN`
+     (to `laptop-model/`) right after export, and `runs/` at the end. Don't skip the `usb` step.
+   - Any adapter found only on one machine (e.g. `sft-v2` on the other faculty machine, 30/09) goes to the USB first.
+   - Remind me to back up the USB's `ai-tutor-faculty` to the laptop or Drive.
+   - `runs/` and `checkpoints/` go back to the laptop on the USB drive.
    The status site can be published from this machine through a **deploy key** that can write only to `ai-tutor-status`
    (setup: faculty guide 3.3; key at `D:/ai-tutor-work/status_key`, repo cloned to `Documents/ai-tutor-status`).
    Publish only from the machine that has the newest `runs/`, or results vanish from the site.
