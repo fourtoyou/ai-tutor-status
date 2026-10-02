@@ -65,8 +65,15 @@ Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Tra
   base 89 · 79 · 78, sft-v3 0 · 0 · 0. No model catches a wrong worked solution in a photo yet.
 - **Round 4 (`data/sft-v4`)** = sft-v3 + ~400 "correct answer → AI confirms" examples from MathDial *train* problems
   (`tutor/build_confirm_data.py`; replies written by base Qwen3 and filtered; user phrasing avoids the
-  answer_check templates on purpose). Training started 20:06 on IF-702-05 via `runs/_faculty/queue-r4.ps1`;
-  results stay on that machine until copied to the USB. Check accept-wrong too: a yes-man is not a fix.
+  answer_check templates on purpose).
+  - Trained on IF-702-05: 412 new examples, 2,062 train dialogues, eval loss 1.366 with no climb.
+  - Measured and synced to the laptop and site on 02/10. Main cell: 1 · 0 · 1 (loose 3 · 2 · 1). The other cells are 0.
+  - Confirms a correct answer 54% (sft-v3 12%, base 89.5%), so this is better but not fixed.
+  - **New problem: it became more of a yes-man.**
+    - It accepts a wrong answer as correct 39.5% in answer_check (sft-v3 10.5%, base 33%).
+    - It does the same on the escalate5 wrong guess 16 · 20 · 21% (base 5–8%).
+    - Next round needs "wrong answer → AI points to the step" examples (B's task) mixed with the confirm examples.
+  - Personas on sft-v4: 0 · 0 · 0 strict (loose 0 · 5 · 1).
 - Demo page (30/09): Claude-style chat sidebar (chats in localStorage), settings dialog with tabs (avatar picker lives
   there), neural Thai TTS (`tutor/tts.py`, VITS; MMS base is CC-BY-NC), 🔊 listen with pause/resume,
   ChatGPT-style voice mode (VAD, full screen), camera → Qwen3-VL (`tutor/vision.py`). Voice mode untested with a real mic.
