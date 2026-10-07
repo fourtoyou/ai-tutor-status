@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='13' font-size='13'%3E%F0%9F%8E%99%3C/text%3E%3C/svg%3E">
+<title>อัดเสียงทดสอบ AI ติวเตอร์</title>
+<style>
+:root{
+  --bg:#f4f6f9; --card:#ffffff; --ink:#1b2128; --mute:#58636f; --line:#d5dce4;
+  --accent:#2057d6; --on-accent:#ffffff; --rec:#c62828; --on-rec:#ffffff;
+  --ok:#14703f; --ok-bg:#e3f4ea; --warn:#8a5200; --warn-bg:#fff2d9; --err:#a61b1b; --err-bg:#fde8e8;
+  --focus:#1a73e8; --shadow:0 1px 2px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0e1116; --card:#171b22; --ink:#e9edf2; --mute:#a0abb8; --line:#2f3844;
+    --accent:#6a9bff; --on-accent:#0a1220; --rec:#ff6b64; --on-rec:#2a0705;
+    --ok:#6ee0a0; --ok-bg:#12301f; --warn:#ffcf70; --warn-bg:#35280c; --err:#ff9a9a; --err-bg:#3a1414;
+    --focus:#8ab4ff; --shadow:none;
+  }
+}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 "Noto Sans Thai","Leelawadee UI",Tahoma,system-ui,-apple-system,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:720px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-right)) 56px max(16px,env(safe-area-inset-left))}
+h1{font-size:1.5rem;line-height:1.35;margin:8px 0 4px}
+h2{font-size:1.1rem;line-height:1.4;margin:0 0 8px}
+.sub{margin:0 0 14px;color:var(--mute)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px;box-shadow:var(--shadow)}
+label{display:block;font-weight:600;margin-bottom:4px}
+input[type=text],.linkrow input{font:inherit;font-size:1.1rem;width:100%;min-height:52px;padding:8px 12px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+#code{max-width:14rem;letter-spacing:.04em}
+.help{margin:6px 0 0;color:var(--mute);font-size:.95rem}
+details.card summary{font-weight:700;font-size:1.1rem;cursor:pointer;min-height:44px;display:flex;align-items:center}
+details.card ul{margin:6px 0 0;padding-left:1.3rem}
+details.card li{margin:4px 0}
+.notice{border-radius:12px;padding:10px 14px;margin:0 0 12px;border:1px solid}
+.notice p{margin:0 0 6px}
+.notice.warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)}
+.notice.err{background:var(--err-bg);color:var(--err);border-color:var(--err)}
+.linkrow{display:flex;gap:8px;flex-wrap:wrap}
+.linkrow input{flex:1 1 200px}
+.prog{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:600}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin:6px 0 14px}
+.bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .2s}
+.sent-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{display:inline-block;border-radius:99px;padding:0 12px;font-size:.9rem;font-weight:600;border:1px solid var(--line);background:var(--bg)}
+.chip.id{font-family:ui-monospace,Consolas,monospace;letter-spacing:.03em}
+.okmark{color:var(--ok);font-weight:700}
+.sentence{font-size:clamp(1.65rem,5.2vw + .5rem,2.5rem);line-height:1.55;font-weight:600;margin:10px 0 14px;overflow-wrap:break-word;min-height:3.2em}
+.meter-row{display:flex;align-items:center;gap:10px;font-size:.95rem;color:var(--mute)}
+.meter{flex:1;height:12px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--ok);transition:width .06s}
+#timer{min-width:2.8rem;text-align:right;font-variant-numeric:tabular-nums}
+.mic-name{margin:2px 0 0;font-size:.85rem;color:var(--mute);min-height:1.2em;overflow-wrap:anywhere}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 8px}
+.btn{font:inherit;font-weight:700;min-height:56px;padding:10px 16px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:1 1 130px;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.rec{flex:1 1 100%;min-height:68px;font-size:1.3rem;background:var(--rec);border-color:var(--rec);color:var(--on-rec)}
+.btn.rec.on{animation:pulse 1.2s infinite}
+.btn.rec:disabled{background:var(--line);border-color:var(--line);color:var(--mute);opacity:1}
+.btn.danger{color:var(--err);border-color:var(--err)}
+.btn.danger.solid{background:var(--err);color:var(--bg)}
+.btn.small{min-height:48px;font-weight:600;flex:0 1 auto}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(214,48,40,.28)}}
+@media (prefers-reduced-motion:reduce){.btn.rec.on{animation:none}.bar i,.meter i{transition:none}}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.status{margin:8px 0 0;padding:8px 12px;border-radius:10px;min-height:2.6em;background:var(--bg);color:var(--ink)}
+.status.ok{background:var(--ok-bg);color:var(--ok)}
+.status.warn{background:var(--warn-bg);color:var(--warn)}
+#err{margin:8px 0 0;padding:8px 12px;border-radius:10px;background:var(--err-bg);color:var(--err);border:1px solid var(--err)}
+.nav{display:flex;gap:10px;margin-top:12px}
+.nav .btn{flex:1 1 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:8px}
+.cell{font:inherit;font-size:.9rem;min-height:48px;padding:4px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;touch-action:manipulation;font-family:ui-monospace,Consolas,monospace}
+.cell.done{background:var(--ok-bg);color:var(--ok);border-color:var(--ok);font-weight:700}
+.cell.cur{outline:3px solid var(--accent);outline-offset:1px}
+.cell:disabled{opacity:.5;cursor:not-allowed}
+.legend{margin:8px 0 0;color:var(--mute);font-size:.9rem}
+.all-done{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:var(--ok-bg);color:var(--ok);font-weight:700}
+#dlbox{margin-top:12px;padding:10px 12px;border:1px dashed var(--line);border-radius:10px}
+#dlbox p{margin:0 0 6px;font-size:.95rem}
+#dlink{display:inline-block;padding:10px 0;color:var(--accent);font-weight:700;overflow-wrap:anywhere}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+dialog{max-width:min(92vw,28rem);border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);padding:18px}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog h3{margin:0 0 8px}
+dialog p{white-space:pre-line;margin:0 0 14px}
+@media (min-width:640px){.btns .btn:not(.rec){flex:1 1 0}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <h1>อัดเสียงทดสอบ AI ติวเตอร์</h1>
+    <p class="sub">อ่านออกเสียง 30 ประโยค ใช้เวลาประมาณ 10 นาที · ไม่ต้องติดตั้งอะไร · เสียงอยู่ในเครื่องของคุณ ไม่ถูกส่งขึ้นอินเทอร์เน็ตจนกว่าคุณจะส่งไฟล์เอง</p>
+  </header>
+  <noscript><div class="notice err"><p>หน้านี้ต้องเปิด JavaScript ถึงจะใช้งานได้</p></div></noscript>
+  <div id="notices"></div>
+
+  <section class="card" aria-labelledby="h-code">
+    <h2 id="h-code">1. ใส่รหัสผู้พูด</h2>
+    <label for="code">รหัสของคุณ (เช่น s1)</label>
+    <input id="code" type="text" maxlength="12" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="text" placeholder="s1">
+    <p class="help">ใช้รหัสสั้น ๆ เช่น s1 s2 s3 (ตัวอักษรอังกฤษหรือตัวเลข 2–12 ตัว) ไม่ต้องใช้ชื่อจริง ใช้แยกว่าไฟล์เสียงเป็นของใคร</p>
+  </section>
+
+  <details class="card" id="tips" open>
+    <summary>2. ก่อนอัด อ่านสั้น ๆ</summary>
+    <ul>
+      <li>อยู่ในที่เงียบ ปิดพัดลม ทีวี หรือเพลงที่เปิดอยู่</li>
+      <li>พูดเสียงปกติ เหมือนคุยกับ AI ไม่ต้องตะโกน ไม่ต้องพูดช้าหรือเน้นคำเป็นพิเศษ</li>
+      <li>อ่านให้ตรงตามตัวหนังสือที่เห็น ไม่ต้องแก้คำ แม้เป็นภาษาพูด (เช่น "อะ")</li>
+      <li>ตัวเลขอ่านแบบที่พูดจริง ๆ เช่น 250 อ่านว่า "สองร้อยห้าสิบ" · 1,200 อ่านว่า "หนึ่งพันสองร้อย" · 3.5 อ่านว่า "สามจุดห้า"</li>
+      <li>กด "อัด" แล้วรอสักครู่ก่อนเริ่มพูด พออ่านจบรอครู่หนึ่งแล้วค่อยกด "หยุด" ถ้าพูดผิดหรือสะดุด กด "อัดใหม่" ได้เลย</li>
+      <li>ถ้าใช้มือถือ: ถือห่างปากประมาณ 1 คืบ อย่าเอานิ้วบังไมค์ และเปิดหน้านี้ใน Chrome (Android) หรือ Safari (iPhone)</li>
+    </ul>
+  </details>
+
+  <section class="card" aria-labelledby="h-rec">
+    <h2 id="h-rec">3. อัดทีละประโยค</h2>
+    <div class="prog"><span id="pos">ประโยคที่ 1/30</span><span id="doneCount">อัดแล้ว 0/30</span></div>
+    <div class="bar" id="bar" role="progressbar" aria-label="ความคืบหน้าการอัด" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0"><i id="barFill"></i></div>
+    <div class="sent-meta"><span class="chip id" id="sid"></span><span class="chip" id="skind"></span><span class="okmark" id="sdone" hidden>อัดแล้ว ✓</span></div>
+    <p class="sentence" id="stext" lang="th"></p>
+    <div class="meter-row" aria-hidden="true"><span>ระดับเสียงไมค์</span><div class="meter"><i id="lvl"></i></div><span id="timer">0:00</span></div>
+    <p class="mic-name" id="micName"></p>
+    <div class="btns">
+      <button type="button" class="btn rec" id="btnRec"></button>
+      <button type="button" class="btn" id="btnPlay"></button>
+      <button type="button" class="btn" id="btnRe"><span aria-hidden="true">↻</span>อัดใหม่</button>
+    </div>
+    <div id="msg" class="status" aria-live="polite">ใส่รหัสผู้พูดด้านบน แล้วกด "อัด" ไมค์จะขออนุญาตครั้งแรกให้กด "อนุญาต"</div>
+    <div id="err" role="alert" hidden></div>
+    <div class="nav">
+      <button type="button" class="btn" id="btnPrev"><span aria-hidden="true">←</span>ก่อนหน้า</button>
+      <button type="button" class="btn" id="btnNext">ถัดไป<span aria-hidden="true">→</span></button>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-grid">
+    <h2 id="h-grid">ประโยคไหนอัดแล้วบ้าง</h2>
+    <div class="grid" id="grid" role="group" aria-label="รายการประโยค แตะเพื่อไปที่ประโยคนั้น"></div>
+    <p class="legend">แตะที่ช่องเพื่อข้ามไปประโยคนั้น · ช่องที่มี ✓ คืออัดแล้ว</p>
+  </section>
+
+  <section class="card" aria-labelledby="h-exp">
+    <h2 id="h-exp">4. ส่งไฟล์</h2>
+    <div class="all-done" id="allDone" hidden>อัดครบทุกประโยคแล้ว ขอบคุณมาก! กดดาวน์โหลดด้านล่าง</div>
+    <div class="row">
+      <button type="button" class="btn primary" id="btnExport">⬇ ดาวน์โหลด asr-….zip</button>
+    </div>
+    <p class="help" id="exportHint"></p>
+    <div id="dlbox" hidden>
+      <p>ถ้าไฟล์ไม่เริ่มดาวน์โหลดเอง (เช่นบน iPhone) แตะลิงก์นี้ หรือแตะค้างแล้วเลือก "ดาวน์โหลด / บันทึก / แชร์":</p>
+      <a id="dlink" href="#" download>asr.zip</a>
+      <div class="row"><button type="button" class="btn small" id="btnShare" hidden>แชร์ไฟล์ (ส่งต่อทาง LINE / Drive ฯลฯ)</button></div>
+    </div>
+    <p class="help">เสียงที่อัดแล้วเก็บในเบราว์เซอร์นี้ รีเฟรชหน้าได้ไม่หาย แต่ถ้าล้างข้อมูลเบราว์เซอร์หรือเปลี่ยนเครื่อง จะหาย ดาวน์โหลดเก็บไว้ก่อนเสมอ</p>
+    <div class="row" style="margin-top:8px"><button type="button" class="btn danger small" id="btnClear">ล้างทั้งหมด</button></div>
+  </section>
+</main>
+
+<dialog id="dlg" aria-labelledby="dlgT">
+  <form method="dialog">
+    <h3 id="dlgT"></h3>
+    <p id="dlgP"></p>
+    <div class="btns">
+      <button class="btn" value="cancel" id="dlgNo"></button>
+      <button class="btn primary" value="ok" id="dlgYes"></button>
+    </div>
+  </form>
+</dialog>
+
+<script id="core">
+(function (root) {
+  'use strict';
+  var OUT_RATE = 16000;
+
+  function gcd(a, b) { while (b) { var t = a % b; a = b; b = t; } return a; }
+
+  // ลดอัตราสุ่มด้วย windowed-sinc (กรองความถี่สูงก่อน กันเสียงเพี้ยน) ไม่ปรับความดัง
+  // คำนวณน้ำหนักเคอร์เนลไว้ล่วงหน้าตาม "เฟส" (เศษของตำแหน่ง) เพื่อให้เร็วพอรันบนมือถือ
+  function resample(x, inRate, outRate) {
+    if (inRate === outRate) return Float32Array.from(x);
+    var n = Math.floor(x.length * outRate / inRate);
+    var out = new Float32Array(n);
+    var g = gcd(inRate, outRate), p = inRate / g, q = outRate / g;
+    var P = Math.min(q, 1024);                       // จำนวนเฟสในตาราง (q<=1024 แม่นพอดี)
+    var scale = Math.min(1, outRate / inRate);
+    var fc = 0.5 * scale * 0.98;                     // ความถี่ตัด (รอบ/ตัวอย่างขาเข้า)
+    var half = 10 / (2 * fc);                        // ครึ่งความกว้างเคอร์เนล ~10 lobe
+    var L = Math.ceil(half), T = 2 * L;              // ใช้ตัวอย่าง base-L+1 .. base+L
+    var wt = new Float64Array(P * T), norm = new Float64Array(P);
+    for (var ph = 0; ph < P; ph++) {
+      var fr = ph / P, sum = 0;
+      for (var j = 0; j < T; j++) {
+        var d = (j - L + 1) - fr, r = d / half, h = 0;
+        if (r > -1 && r < 1) {
+          var u = 2 * fc * d, s = d === 0 ? 1 : Math.sin(Math.PI * u) / (Math.PI * u);
+          h = s * (0.42 + 0.5 * Math.cos(Math.PI * r) + 0.08 * Math.cos(2 * Math.PI * r));  // Blackman
+        }
+        wt[ph * T + j] = h; sum += h;
+      }
+      norm[ph] = 1 / sum;
+    }
+    var last = x.length - 1;
+    for (var k = 0; k < n; k++) {
+      var pos = k * p, base = Math.floor(pos / q), fq = (pos - base * q) / q;
+      var pi = Math.round(fq * P);
+      if (pi === P) { pi = 0; base++; }
+      var o = pi * T, first = base - L + 1, acc = 0;
+      if (first >= 0 && base + L <= last) {
+        for (var j2 = 0; j2 < T; j2++) acc += x[first + j2] * wt[o + j2];
+        out[k] = acc * norm[pi];
+      } else {                                       // ชายขอบ: ใช้เฉพาะตัวอย่างที่มีจริง แล้วหารผลรวมน้ำหนักใหม่
+        var ws = 0;
+        for (var j3 = 0; j3 < T; j3++) {
+          var idx = first + j3;
+          if (idx < 0 || idx > last) continue;
+          acc += x[idx] * wt[o + j3]; ws += wt[o + j3];
+        }
+        out[k] = ws ? acc / ws : 0;
+      }
+    }
+    return out;
+  }
+
+  function toPcm16(f) {
+    var o = new Int16Array(f.length);
+    for (var i = 0; i < f.length; i++) {
+      var s = f[i];
+      if (s > 1) s = 1; else if (s < -1) s = -1;
+      o[i] = Math.round(s < 0 ? s * 32768 : s * 32767);
+    }
+    return o;
+  }
+
+  // WAV PCM 16-bit mono
+  function wavBytes(pcm, rate) {
+    var dl = pcm.length * 2, buf = new ArrayBuffer(44 + dl), v = new DataView(buf);
+    function str(o, s) { for (var i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); }
+    str(0, 'RIFF'); v.setUint32(4, 36 + dl, true); str(8, 'WAVE');
+    str(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+    str(36, 'data'); v.setUint32(40, dl, true);
+    for (var i = 0; i < pcm.length; i++) v.setInt16(44 + i * 2, pcm[i], true);
+    return new Uint8Array(buf);
+  }
+
+  // เสียงดิบจากไมค์ (float32, inRate) -> WAV 16 kHz
+  function recordToWav(f32, inRate) {
+    var pcm = toPcm16(resample(f32, inRate, OUT_RATE));
+    var peak = 0;
+    for (var i = 0; i < pcm.length; i++) { var a = Math.abs(pcm[i]); if (a > peak) peak = a; }
+    return { wav: wavBytes(pcm, OUT_RATE), peak: peak / 32768, seconds: pcm.length / OUT_RATE, samples: pcm.length };
+  }
+
+  // CRC32 (ตาราง)
+  var TABLE = (function () {
+    var t = new Uint32Array(256);
+    for (var n = 0; n < 256; n++) {
+      var c = n;
+      for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      t[n] = c >>> 0;
+    }
+    return t;
+  })();
+  function crc32(u8) {
+    var c = 0xFFFFFFFF;
+    for (var i = 0; i < u8.length; i++) c = TABLE[(c ^ u8[i]) & 255] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  function utf8(s) { return new TextEncoder().encode(s); }
+
+  // ZIP แบบ STORE (ไม่บีบอัด) files = [{name, data: Uint8Array}]
+  function makeZip(files, when) {
+    when = when || new Date();
+    var yr = Math.max(1980, when.getFullYear());
+    var dt = ((when.getHours() << 11) | (when.getMinutes() << 5) | (when.getSeconds() >> 1)) & 0xFFFF;
+    var dd = (((yr - 1980) << 9) | ((when.getMonth() + 1) << 5) | when.getDate()) & 0xFFFF;
+    var parts = [], central = [], offset = 0, cdSize = 0;
+    if (files.length > 0xFFFF) throw new Error('ไฟล์เยอะเกินไป');
+    files.forEach(function (f) {
+      var name = utf8(f.name), data = f.data, size = data.length, crc = crc32(data);
+      if (offset + size > 0xFFFFFFF0) throw new Error('zip ใหญ่เกินไป');
+      var lh = new Uint8Array(30 + name.length), v = new DataView(lh.buffer);
+      v.setUint32(0, 0x04034b50, true); v.setUint16(4, 20, true); v.setUint16(6, 0x0800, true); v.setUint16(8, 0, true);
+      v.setUint16(10, dt, true); v.setUint16(12, dd, true); v.setUint32(14, crc, true);
+      v.setUint32(18, size, true); v.setUint32(22, size, true); v.setUint16(26, name.length, true); v.setUint16(28, 0, true);
+      lh.set(name, 30);
+      var ch = new Uint8Array(46 + name.length), c = new DataView(ch.buffer);
+      c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true);
+      c.setUint16(10, 0, true); c.setUint16(12, dt, true); c.setUint16(14, dd, true); c.setUint32(16, crc, true);
+      c.setUint32(20, size, true); c.setUint32(24, size, true); c.setUint16(28, name.length, true);
+      c.setUint32(42, offset, true);
+      ch.set(name, 46);
+      parts.push(lh, data); central.push(ch);
+      offset += lh.length + size; cdSize += ch.length;
+    });
+    var end = new Uint8Array(22), e = new DataView(end.buffer);
+    e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true);
+    e.setUint32(12, cdSize, true); e.setUint32(16, offset, true);
+    var all = parts.concat(central, [end]), total = 0;
+    all.forEach(function (p) { total += p.length; });
+    var out = new Uint8Array(total), pos = 0;
+    all.forEach(function (p) { out.set(p, pos); pos += p.length; });
+    return out;
+  }
+
+  // เปิดในเบราว์เซอร์ฝังของแอป (LINE/Facebook ฯลฯ) ซึ่งมักบล็อกไมค์ -> คืนชื่อแอป หรือ ''
+  function inAppName(ua) {
+    ua = ua || '';
+    if (/\bLine\//i.test(ua)) return 'LINE';
+    if (/FBAN|FBAV|FB_IAB|FBIOS|FB4A|FBMD/.test(ua)) return 'Facebook / Messenger';
+    if (/Instagram/i.test(ua)) return 'Instagram';
+    if (/MicroMessenger/i.test(ua)) return 'WeChat';
+    if (/TikTok|musical_ly|BytedanceWebview/i.test(ua)) return 'TikTok';
+    if (/Snapchat/i.test(ua)) return 'Snapchat';
+    if (/\bTwitter/i.test(ua)) return 'Twitter / X';
+    if (/; wv\)/.test(ua)) return 'แอปบนมือถือ';
+    return '';
+  }
+
+  var api = { OUT_RATE: OUT_RATE, resample: resample, toPcm16: toPcm16, wavBytes: wavBytes,
+              recordToWav: recordToWav, crc32: crc32, makeZip: makeZip, inAppName: inAppName };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.RecCore = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script id="app">
+(function () {
+'use strict';
+const SENTENCES = [{"id": "p01", "kind": "โจทย์", "text": "ร้านขายส้ม 12 กิโลกรัม ขายไปแล้ว 5 กิโลกรัม เหลือกี่กิโลกรัม"}, {"id": "p02", "kind": "โจทย์", "text": "สมชายมีเงิน 250 บาท ซื้อหนังสือราคา 180 บาท เหลือเงินกี่บาท"}, {"id": "p03", "kind": "โจทย์", "text": "รถวิ่งด้วยความเร็ว 60 กิโลเมตรต่อชั่วโมง ใช้เวลา 3 ชั่วโมง วิ่งได้กี่กิโลเมตร"}, {"id": "p04", "kind": "โจทย์", "text": "แม่ซื้อไข่มา 3 แผง แผงละ 30 ฟอง ทำไข่เจียวไป 8 ฟอง เหลือไข่กี่ฟอง"}, {"id": "p05", "kind": "โจทย์", "text": "ห้องเรียนมีนักเรียน 40 คน เป็นผู้หญิง 18 คน มีผู้ชายกี่คน"}, {"id": "p06", "kind": "โจทย์", "text": "ขนมชิ้นละ 15 บาท ซื้อ 6 ชิ้น ต้องจ่ายเงินเท่าไหร่"}, {"id": "p07", "kind": "โจทย์", "text": "มีดินสอ 48 แท่ง แบ่งให้เพื่อน 4 คนเท่า ๆ กัน ได้คนละกี่แท่ง"}, {"id": "p08", "kind": "โจทย์", "text": "สินค้าราคา 1,200 บาท ลดราคา 25 เปอร์เซ็นต์ ต้องจ่ายเงินเท่าไหร่"}, {"id": "s01", "kind": "ตื๊อ", "text": "ไม่รู้อะ บอกคำตอบเลยได้ไหม"}, {"id": "s02", "kind": "ตื๊อ", "text": "หนูยอมแพ้แล้ว ทำไม่เป็นจริง ๆ"}, {"id": "s03", "kind": "ตื๊อ", "text": "ครูที่โรงเรียนบอกว่าวันนี้บอกคำตอบได้"}, {"id": "s04", "kind": "ตื๊อ", "text": "ต้องส่งการบ้านอีกห้านาทีแล้ว รีบบอกหน่อย"}, {"id": "s05", "kind": "ตื๊อ", "text": "ช่วยใบ้หน่อยได้ไหม ติดตรงนี้"}, {"id": "a01", "kind": "ตอบ", "text": "หนูคิดว่าเหลือ 70 บาท"}, {"id": "a02", "kind": "ตอบ", "text": "ต้องเอา 250 ลบ 180 ใช่ไหม"}, {"id": "a03", "kind": "ตอบ", "text": "ได้ 36 แท่ง"}, {"id": "a04", "kind": "ตอบ", "text": "สิบสองคูณสามได้สามสิบหก"}, {"id": "a05", "kind": "ตอบ", "text": "เหลือ 7 กิโลกรัมใช่ไหม"}, {"id": "a06", "kind": "ตอบ", "text": "หนูตอบ 1,250 ถูกไหม"}, {"id": "a07", "kind": "ตอบ", "text": "ได้ 3.5 ชั่วโมง"}, {"id": "a08", "kind": "ตอบ", "text": "ร้อยละ 25 ของ 1,200 คือ 300"}, {"id": "a09", "kind": "ตอบ", "text": "ต้องคูณก่อนแล้วค่อยลบ"}, {"id": "a10", "kind": "ตอบ", "text": "82 ฟอง"}, {"id": "q01", "kind": "ถาม", "text": "ขั้นแรกต้องทำอะไร"}, {"id": "q02", "kind": "ถาม", "text": "ข้อนี้ต้องบวกหรือลบ"}, {"id": "q03", "kind": "ถาม", "text": "ผิดตรงไหนเหรอ"}, {"id": "q04", "kind": "ถาม", "text": "ยังไม่เข้าใจเลย ช่วยอธิบายอีกทีได้ไหม"}, {"id": "q05", "kind": "ถาม", "text": "เปอร์เซ็นต์คืออะไร"}, {"id": "q06", "kind": "ถาม", "text": "ถูกไหม"}, {"id": "q07", "kind": "ถาม", "text": "แล้วต้องหารด้วยอะไร"}];          // [{id, kind, text}] จาก data/asr_refs.jsonl
+const REFS_SHA = 'cce397f31883cb57ca73680b6ae62372653544af85d3d29036e2b886adbe3e17';
+const BUILT = '2026-10-07';
+const N = SENTENCES.length;
+// เหมือน demo/voice.html ตอนกดไมค์ (startRec) ; โหมดคุยต่อเนื่องเพิ่ม autoGainControl:true ซึ่ง Chrome เปิดเป็นค่าเริ่มต้นอยู่แล้ว
+const CONSTRAINTS = { audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } };
+const MIN_SEC = 0.5, MAX_SEC = 30;
+const KIND = { 'โจทย์': 'โจทย์เลข', 'ตื๊อ': 'ขอคำตอบ', 'ตอบ': 'ตอบโจทย์', 'ถาม': 'ถามกลับ' };
+const CODE_RE = /^[a-z0-9][a-z0-9_-]{1,11}$/;
+const UA = navigator.userAgent || '';
+const MOBILE = /Android|iPhone|iPad|iPod/i.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const $ = (id) => document.getElementById(id);
+const S = { code: '', idx: 0, recs: new Map(), recording: null, starting: false, playing: null, memOnly: false, tok: 0, dl: null };
+const MIC = { ctx: null, stream: null, node: null, mode: '', rate: 0, label: '', settings: null, peak: 0, disp: 0 };
+
+/* ---------- ข้อความ ---------- */
+function say(kind, text) {                 // kind: info | ok | warn | err
+  const m = $('msg'), e = $('err');
+  if (kind === 'err') { e.textContent = text; e.hidden = false; m.textContent = ''; m.className = 'status'; }
+  else { e.hidden = true; e.textContent = ''; m.textContent = text; m.className = 'status ' + kind; }
+}
+function addNotice(kind, text, extra) {
+  const d = document.createElement('div');
+  d.className = 'notice ' + kind;
+  const p = document.createElement('p'); p.textContent = text; d.appendChild(p);
+  if (extra) d.appendChild(extra);
+  $('notices').appendChild(d);
+}
+function setBtn(b, glyph, text) {
+  b.textContent = '';
+  const g = document.createElement('span'); g.setAttribute('aria-hidden', 'true'); g.textContent = glyph;
+  b.appendChild(g); b.appendChild(document.createTextNode(text));
+}
+const fmt = (s) => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+function quiet(fn) { try { const r = fn(); if (r && r.catch) r.catch(() => {}); } catch (e) {} }
+
+/* ---------- เก็บเสียงใน IndexedDB (รีเฟรชแล้วไม่หาย) ---------- */
+let dbp = null;
+function openDb() {
+  if (dbp) return dbp;
+  dbp = new Promise((res, rej) => {
+    if (!window.indexedDB) return rej(new Error('no indexedDB'));
+    const r = indexedDB.open('asr-recorder', 1);
+    r.onupgradeneeded = () => { const d = r.result; d.createObjectStore('rec', { keyPath: 'key' }); d.createObjectStore('kv'); };
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error || new Error('db'));
+    r.onblocked = () => rej(new Error('db blocked'));
+  });
+  return dbp;
+}
+function dbReq(store, mode, fn) {
+  return openDb().then((db) => new Promise((res, rej) => {
+    const t = db.transaction(store, mode);
+    const rq = fn(t.objectStore(store));
+    t.oncomplete = () => res(rq ? rq.result : undefined);
+    t.onerror = t.onabort = () => rej(t.error || new Error('db'));
+  }));
+}
+const range = (code) => IDBKeyRange.bound(code + '/', code + '/\uffff');
+async function persist(fn) {               // เขียนไม่ได้ก็ไม่พัง แต่เตือนให้อย่ารีเฟรช
+  if (S.memOnly) return;
+  try { await fn(); } catch (e) { memOnly(); }
+}
+function memOnly() {
+  if (S.memOnly) return;
+  S.memOnly = true;
+  addNotice('warn', 'เบราว์เซอร์นี้เก็บเสียงถาวรไม่ได้ (อาจเปิดโหมดส่วนตัวอยู่) อย่ารีเฟรชหรือปิดหน้านี้ จนกว่าจะดาวน์โหลดไฟล์ zip');
+}
+
+/* ---------- ไมค์ + จับเสียงดิบ ---------- */
+const WORKLET_SRC = `
+class Cap extends AudioWorkletProcessor {
+  constructor() { super(); this.b = new Float32Array(2048); this.n = 0; }
+  process(inputs) {
+    const inp = inputs[0];
+    if (inp && inp.length) {
+      const c0 = inp[0];
+      for (let i = 0; i < c0.length; i++) {
+        let v = c0[i];
+        for (let c = 1; c < inp.length; c++) v += inp[c][i];
+        this.b[this.n++] = v / inp.length;
+        if (this.n === this.b.length) { const o = this.b; this.port.postMessage(o, [o.buffer]); this.b = new Float32Array(2048); this.n = 0; }
+      }
+    }
+    return true;
+  }
+}
+registerProcessor('cap', Cap);`;
+
+function onChunk(f) {
+  let p = 0;
+  for (let i = 0; i < f.length; i++) { const a = f[i] < 0 ? -f[i] : f[i]; if (a > p) p = a; }
+  if (p > MIC.peak) MIC.peak = p;
+  const r = S.recording;
+  if (r) {
+    r.chunks.push(f); r.n += f.length;
+    if (r.n / MIC.rate > MAX_SEC) stopRec('max');
+  }
+}
+async function makeNode(ctx) {
+  if (ctx.audioWorklet && window.AudioWorkletNode) {
+    // data: ก่อน (ใช้ได้ทั้ง file:// และ https) ; blob: ไว้สำรอง เพราะบน file:// Chrome บล็อก blob: และขึ้น error ในคอนโซล
+    const urls = [];
+    try { urls.push('data:application/javascript;base64,' + btoa(WORKLET_SRC)); } catch (e) {}
+    try { urls.push(URL.createObjectURL(new Blob([WORKLET_SRC], { type: 'application/javascript' }))); } catch (e) {}
+    for (const u of urls) {
+      try {
+        await ctx.audioWorklet.addModule(u);
+        const n = new AudioWorkletNode(ctx, 'cap', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1] });
+        n.port.onmessage = (e) => onChunk(e.data);
+        return { node: n, mode: 'audioworklet' };
+      } catch (e) { /* ลองวิธีถัดไป */ }
+    }
+  }
+  const sp = ctx.createScriptProcessor(4096, 1, 1);      // สำรอง (เหมือน demo/voice.html)
+  sp.onaudioprocess = (e) => onChunk(new Float32Array(e.inputBuffer.getChannelData(0)));
+  return { node: sp, mode: 'scriptprocessor' };
+}
+function releaseMic() {
+  quiet(() => MIC.node && MIC.node.disconnect());
+  quiet(() => MIC.stream && MIC.stream.getTracks().forEach((t) => t.stop()));
+  quiet(() => MIC.ctx && MIC.ctx.close());
+  MIC.ctx = MIC.stream = MIC.node = null;
+  $('micName').textContent = '';
+}
+// ต้องเรียกตรง ๆ จาก handler ของการแตะ/คลิก: สร้างและ resume AudioContext ก่อน await ใด ๆ (กฎของ iOS)
+async function ensureMic() {
+  if (MIC.ctx && MIC.ctx.state !== 'closed' && MIC.stream && MIC.stream.active) {
+    try { if (MIC.ctx.state !== 'running') await MIC.ctx.resume(); if (MIC.ctx.state === 'running') return; } catch (e) {}
+  }
+  releaseMic();                               // เปิดใหม่ทั้งชุด (เช่น iOS ตัดเสียงตอนสลับแอป)
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { const e = new Error('no mediaDevices'); e.name = 'NoMediaDevices'; throw e; }
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) { const e = new Error('no AudioContext'); e.name = 'NoMediaDevices'; throw e; }
+  const ctx = new AC();
+  const resumed = ctx.resume ? ctx.resume() : null;
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia(JSON.parse(JSON.stringify(CONSTRAINTS))); }
+  catch (e) { quiet(() => ctx.close()); throw e; }
+  try { if (resumed) await resumed; if (ctx.state !== 'running') await ctx.resume(); } catch (e) {}
+  try {
+    const src = ctx.createMediaStreamSource(stream);
+    const m = await makeNode(ctx);
+    const sink = ctx.createGain(); sink.gain.value = 0;     // ปิดเสียงออก กันเสียงก้อง
+    src.connect(m.node); m.node.connect(sink); sink.connect(ctx.destination);
+    const tr = stream.getAudioTracks()[0];
+    let settings = null;
+    try { settings = JSON.parse(JSON.stringify(tr.getSettings ? tr.getSettings() : {})); } catch (e) {}
+    Object.assign(MIC, { ctx, stream, node: m.node, mode: m.mode, rate: ctx.sampleRate, label: (tr && tr.label) || '', settings });
+    tr.addEventListener('ended', () => {
+      if (MIC.stream !== stream) return;
+      if (S.recording) stopRec('lost');
+      releaseMic(); render();
+      say('warn', 'ไมค์หลุด (ถอดสายหรือโปรแกรมอื่นแย่งไปใช้) กด "อัด" อีกครั้งเพื่อเปิดไมค์ใหม่');
+    });
+    $('micName').textContent = MIC.label ? 'ไมค์ที่ใช้: ' + MIC.label : '';
+  } catch (e) {
+    stream.getTracks().forEach((t) => t.stop()); quiet(() => ctx.close());
+    throw e;
+  }
+}
+function micErrorText(e) {
+  const n = (e && e.name) || '';
+  if (n === 'NoMediaDevices') {
+    return location.protocol === 'http:'
+      ? 'หน้านี้เปิดผ่าน http:// ไมค์ใช้ไม่ได้ ต้องเปิดผ่านลิงก์ที่ขึ้นต้นด้วย https://'
+      : 'เบราว์เซอร์นี้ใช้ไมค์ไม่ได้ ให้เปิดด้วย Chrome หรือ Edge (คอมพิวเตอร์ / Android) หรือ Safari (iPhone)';
+  }
+  if (n === 'NotAllowedError' || n === 'SecurityError' || n === 'PermissionDeniedError') {
+    return 'เบราว์เซอร์ไม่อนุญาตให้ใช้ไมค์ วิธีแก้: กดไอคอนรูปแม่กุญแจ (หรือรูปไมค์) ข้างช่องที่อยู่เว็บด้านบน แล้วตั้งไมโครโฟนเป็น "อนุญาต" จากนั้นรีเฟรชหน้านี้ (เสียงที่อัดไว้แล้วไม่หาย) แล้วกดอัดอีกครั้ง · บน iPhone: ตั้งค่า > Safari > ไมโครโฟน > อนุญาต';
+  }
+  if (n === 'NotFoundError' || n === 'DevicesNotFoundError' || n === 'OverconstrainedError') {
+    return 'ไม่พบไมโครโฟน ลองเสียบหูฟังที่มีไมค์ หรือตรวจว่าเครื่องมีไมค์ แล้วรีเฟรชหน้านี้ลองใหม่';
+  }
+  if (n === 'NotReadableError' || n === 'TrackStartError' || n === 'AbortError') {
+    return 'เปิดไมค์ไม่ได้ อาจมีโปรแกรมอื่นกำลังใช้ไมค์อยู่ (เช่น Zoom, Teams, LINE) ปิดโปรแกรมนั้นก่อนแล้วลองใหม่';
+  }
+  return 'เปิดไมค์ไม่สำเร็จ (' + (n || 'ไม่ทราบสาเหตุ') + ') ลองรีเฟรชหน้านี้แล้วกด "อนุญาต" เมื่อเบราว์เซอร์ขอใช้ไมค์';
+}
+setInterval(() => {                         // มิเตอร์ระดับเสียง + เวลาที่อัด
+  const p = MIC.peak; MIC.peak = 0;
+  MIC.disp = Math.max(p, MIC.disp * 0.85);
+  $('lvl').style.width = Math.min(100, Math.sqrt(MIC.disp) * 100) + '%';
+  const r = S.recording;
+  if (r) {
+    $('timer').textContent = fmt(r.n / MIC.rate);
+    if (!r.warned && r.n === 0 && Date.now() - r.t0 > 2000) {     // ไมค์เปิดแต่ไม่มีเสียงเข้าเลย
+      r.warned = true;
+      say('warn', 'ยังไม่ได้รับสัญญาณเสียงจากไมค์เลย ตรวจว่าไมค์ไม่ได้ถูกปิดเสียง และเลือกไมค์ถูกตัวในเครื่อง แล้วลองกด "หยุด" และอัดใหม่');
+    }
+  }
+}, 60);
+
+/* ---------- อัด / หยุด / ฟัง ---------- */
+const cur = () => SENTENCES[S.idx];
+const curRec = () => S.recs.get(cur().id);
+function concat(chunks, n) { const o = new Float32Array(n); let p = 0; for (const c of chunks) { o.set(c, p); p += c.length; } return o; }
+
+async function startRec() {
+  if (S.recording || S.starting) return;
+  if (!CODE_RE.test(S.code)) { say('warn', 'ใส่รหัสผู้พูดด้านบนก่อน (2–12 ตัวอักษร เช่น s1) แล้วค่อยกดอัด'); $('code').focus(); return; }
+  stopPlay();
+  S.starting = true; render();
+  say('info', MIC.stream ? 'กำลังเตรียมไมค์…' : 'ถ้ามีป๊อปอัปขอใช้ไมค์ ให้กด "อนุญาต" (Allow)');
+  try { await ensureMic(); }
+  catch (e) { S.starting = false; render(); say('err', micErrorText(e)); return; }
+  S.starting = false;
+  S.recording = { id: cur().id, chunks: [], n: 0, t0: Date.now(), warned: false };
+  $('timer').textContent = '0:00';
+  render();
+  say('info', 'กำลังอัด… รอสักครู่ แล้วอ่านประโยคด้านบน พออ่านจบกด "หยุด"');
+}
+function stopRec(why) {
+  const r = S.recording; if (!r) return;
+  S.recording = null;
+  const out = RecCore.recordToWav(concat(r.chunks, r.n), MIC.rate || 48000);
+  if (out.seconds < MIN_SEC) {
+    render();
+    say('warn', r.n === 0 ? 'ไม่ได้รับสัญญาณเสียงจากไมค์เลย (ยังไม่ได้บันทึก) ตรวจว่าไมค์ไม่ได้ถูกปิดเสียงและเลือกไมค์ถูกตัว แล้วลองใหม่'
+      : 'อัดสั้นเกินไป (ไม่ถึงครึ่งวินาที) ยังไม่ได้บันทึก ลองกดอัดแล้วพูดให้จบก่อนกดหยุด');
+    return;
+  }
+  const rec = { key: S.code + '/' + r.id, code: S.code, id: r.id, wav: out.wav.buffer, seconds: out.seconds, peak: out.peak,
+                capRate: MIC.rate, mode: MIC.mode, settings: MIC.settings, label: MIC.label, at: Date.now() };
+  S.recs.set(r.id, rec);
+  persist(() => dbReq('rec', 'readwrite', (os) => os.put(rec)));
+  render();
+  const sec = out.seconds.toFixed(1);
+  if (why === 'max') say('warn', 'อัดนานเกิน ' + MAX_SEC + ' วินาที หยุดให้อัตโนมัติ (บันทึกแล้ว ' + sec + ' วิ) ถ้าอ่านยังไม่จบ กด "อัดใหม่"');
+  else if (why === 'lost') say('warn', 'ไมค์หลุดกลางทาง บันทึกเท่าที่อัดได้ (' + sec + ' วิ) ฟังแล้วถ้าไม่ครบ กด "อัดใหม่"');
+  else if (out.peak < 0.02) say('warn', 'อัดแล้ว (' + sec + ' วิ) แต่เสียงเบามาก ลองพูดให้ใกล้ไมค์ขึ้น หรือตรวจว่าเลือกไมค์ถูกตัว แล้วกด "อัดใหม่"');
+  else if (out.peak >= 0.99) say('warn', 'อัดแล้ว (' + sec + ' วิ) แต่เสียงดังจนแตก ลองถอยห่างไมค์หรือพูดเบาลง แล้วกด "อัดใหม่"');
+  else say('ok', 'อัดแล้ว (' + sec + ' วิ) กด "ฟัง" เพื่อตรวจ ถ้าพอใจกด "ถัดไป" ได้เลย');
+}
+function onRecClick() { if (S.recording) stopRec(); else startRec(); }
+
+function stopPlay() {
+  const p = S.playing; if (!p) return;
+  S.playing = null;
+  quiet(() => p.a.pause()); URL.revokeObjectURL(p.url);
+  render();
+}
+function togglePlay() {
+  if (S.playing) { stopPlay(); return; }
+  const r = curRec(); if (!r || S.recording) return;
+  const url = URL.createObjectURL(new Blob([r.wav], { type: 'audio/wav' }));
+  const a = new Audio(url);
+  S.playing = { a, url };
+  a.onended = stopPlay;
+  a.onerror = () => { stopPlay(); say('warn', 'เล่นเสียงไม่ได้ ลองเพิ่มเสียงเครื่อง หรือกด "อัดใหม่"'); };
+  const pr = a.play();
+  if (pr && pr.catch) pr.catch(() => { stopPlay(); say('warn', 'เล่นเสียงไม่ได้ ลองกดอีกครั้ง หรือเพิ่มเสียงเครื่อง'); });
+  render();
+}
+
+/* ---------- เลื่อนประโยค ---------- */
+function go(i) {
+  if (S.recording || S.starting) return;
+  stopPlay();
+  S.idx = Math.max(0, Math.min(N - 1, i));
+  render();
+  say('info', S.recs.has(cur().id) ? 'ประโยคนี้อัดแล้ว กด "ฟัง" หรือ "อัดใหม่" ได้' : 'กด "อัด" แล้วอ่านประโยคด้านบน พออ่านจบกด "หยุด"');
+}
+const firstUndone = () => { const i = SENTENCES.findIndex((s) => !S.recs.has(s.id)); return i < 0 ? 0 : i; };
+
+/* ---------- รหัสผู้พูด ---------- */
+const normCode = (s) => s.toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 12);
+async function setCode(c) {
+  const tok = ++S.tok;
+  stopPlay(); hideDl();
+  S.code = CODE_RE.test(c) ? c : '';
+  S.recs = new Map();
+  if (S.code) {
+    let rows = [];
+    if (!S.memOnly) { try { rows = await dbReq('rec', 'readonly', (os) => os.getAll(range(S.code))); } catch (e) { memOnly(); } }
+    if (tok !== S.tok) return;
+    rows.forEach((r) => S.recs.set(r.id, r));
+    S.idx = firstUndone();
+    persist(() => dbReq('kv', 'readwrite', (os) => os.put(S.code, 'code')));
+    if (rows.length) say('ok', 'พบเสียงที่เคยอัดไว้ ' + rows.length + ' ประโยค ต่อจากที่ค้างได้เลย');
+  }
+  render();
+}
+
+/* ---------- ส่งออก zip ---------- */
+function ask(title, text, yes, no, danger) {
+  const dlg = $('dlg');
+  if (!dlg.showModal) return Promise.resolve(window.confirm(title + '\n\n' + text));
+  return new Promise((res) => {
+    $('dlgT').textContent = title; $('dlgP').textContent = text;
+    $('dlgYes').textContent = yes; $('dlgNo').textContent = no;
+    $('dlgYes').className = 'btn ' + (danger ? 'danger solid' : 'primary');
+    dlg.returnValue = '';
+    dlg.addEventListener('close', () => res(dlg.returnValue === 'ok'), { once: true });
+    dlg.showModal();
+  });
+}
+function hideDl() {
+  if (S.dl) { URL.revokeObjectURL(S.dl.url); S.dl = null; }
+  $('dlbox').hidden = true;
+}
+async function doExport() {
+  if (!S.code || !S.recs.size) return;
+  const missing = SENTENCES.filter((s) => !S.recs.has(s.id)).map((s) => s.id);
+  if (missing.length) {
+    const ok = await ask('ยังอัดไม่ครบ', 'อัดแล้ว ' + (N - missing.length) + ' จาก ' + N + ' ประโยค ยังขาด: ' + missing.join(' ') +
+      '\n\nดาวน์โหลดเท่าที่มีตอนนี้เลยไหม? (ภายหลังกลับมาอัดเพิ่มแล้วดาวน์โหลดใหม่ได้)', 'ดาวน์โหลดเลย', 'กลับไปอัดต่อ');
+    if (!ok) return;
+  }
+  const items = SENTENCES.filter((s) => S.recs.has(s.id)).map((s) => S.recs.get(s.id));
+  const last = items.slice().sort((a, b) => b.at - a.at)[0];
+  const now = new Date();
+  const meta = {
+    tool: 'อัดเสียงทดสอบ.html', built: BUILT, refs_sha256: REFS_SHA,
+    speaker: S.code, date: now.toISOString(), tz_offset_min: -now.getTimezoneOffset(),
+    format: 'WAV PCM', sample_rate: RecCore.OUT_RATE, channels: 1, bit_depth: 16,
+    user_agent: UA,
+    constraints: CONSTRAINTS,
+    constraints_source: 'demo/voice.html startRec() (กดไมค์) ; โหมดคุยต่อเนื่องเพิ่ม autoGainControl:true ซึ่ง Chrome เปิดเป็นค่าเริ่มต้นอยู่แล้ว',
+    track_settings: last.settings, mic_label: last.label,
+    capture_sample_rate: last.capRate, capture_mode: last.mode,
+    expected: N, recorded: items.length,
+    ids: items.map((r) => r.id), missing: missing,
+    items: items.map((r) => ({ id: r.id, seconds: +r.seconds.toFixed(2), peak: +r.peak.toFixed(3), capture_rate: r.capRate, capture_mode: r.mode }))
+  };
+  const files = items.map((r) => ({ name: S.code + '/' + r.id + '.wav', data: new Uint8Array(r.wav) }));
+  files.push({ name: S.code + '/meta.json', data: new TextEncoder().encode(JSON.stringify(meta, null, 2)) });
+  const zip = RecCore.makeZip(files, now);
+  const name = 'asr-' + S.code + '.zip';
+  hideDl();
+  const blob = new Blob([zip], { type: 'application/zip' });
+  const url = URL.createObjectURL(blob);
+  S.dl = { url, blob, name };
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.rel = 'noopener'; a.hidden = true;
+  document.body.appendChild(a); a.click(); a.remove();
+  const mb = (zip.length / 1048576).toFixed(1);
+  const l = $('dlink'); l.href = url; l.download = name; l.textContent = name + ' (' + mb + ' MB)';
+  $('dlbox').hidden = false;
+  let canShare = false;
+  try { canShare = MOBILE && !!navigator.canShare && navigator.canShare({ files: [new File([blob], name, { type: 'application/zip' })] }); } catch (e) {}
+  $('btnShare').hidden = !canShare;
+  say('ok', 'สร้างไฟล์ ' + name + ' แล้ว (' + items.length + ' ประโยค, ' + mb + ' MB) ไฟล์จะอยู่ในโฟลเดอร์ ดาวน์โหลด (Downloads) ของเครื่อง');
+}
+async function doShare() {
+  if (!S.dl) return;
+  try { await navigator.share({ files: [new File([S.dl.blob], S.dl.name, { type: 'application/zip' })], title: S.dl.name }); }
+  catch (e) { if (e && e.name !== 'AbortError') say('warn', 'แชร์ไม่ได้ ลองแตะลิงก์ดาวน์โหลดค้างไว้แล้วเลือกบันทึก'); }
+}
+async function doClear() {
+  if (!S.code) return;
+  const n = S.recs.size;
+  if (!n) { say('info', 'ยังไม่มีเสียงที่อัดไว้ของรหัส ' + S.code); return; }
+  const ok = await ask('ล้างทั้งหมด?', 'จะลบเสียงที่อัดไว้ทั้งหมดของรหัส ' + S.code + ' (' + n + ' ประโยค) ในเครื่องนี้ และกู้คืนไม่ได้\nถ้ายังไม่ได้ดาวน์โหลด zip ให้กดยกเลิกแล้วดาวน์โหลดก่อน', 'ลบทั้งหมด', 'ยกเลิก', true);
+  if (!ok) return;
+  const code = S.code;
+  await persist(() => dbReq('rec', 'readwrite', (os) => os.delete(range(code))));
+  S.recs = new Map(); S.idx = 0; hideDl();
+  render();
+  say('ok', 'ล้างเสียงของรหัส ' + code + ' แล้ว');
+}
+
+/* ---------- วาดหน้า ---------- */
+function buildGrid() {
+  const g = $('grid');
+  SENTENCES.forEach((s, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'cell'; b.dataset.i = i;
+    b.addEventListener('click', () => go(i));
+    g.appendChild(b);
+  });
+}
+function render() {
+  const s = cur(), done = S.recs.has(s.id), rec = !!S.recording, busy = rec || S.starting;
+  $('pos').textContent = 'ประโยคที่ ' + (S.idx + 1) + '/' + N;
+  $('doneCount').textContent = 'อัดแล้ว ' + S.recs.size + '/' + N;
+  $('barFill').style.width = (100 * S.recs.size / N) + '%';
+  $('bar').setAttribute('aria-valuenow', S.recs.size); $('bar').setAttribute('aria-valuemax', N);
+  $('sid').textContent = s.id; $('skind').textContent = KIND[s.kind] || s.kind; $('sdone').hidden = !done;
+  $('stext').textContent = s.text;
+  if (!rec) $('timer').textContent = done ? fmt(curRec().seconds) : '0:00';
+  const br = $('btnRec');
+  setBtn(br, rec ? '■' : '●', rec ? 'หยุด' : (S.starting ? 'กำลังเปิดไมค์…' : 'อัด'));
+  br.classList.toggle('on', rec);
+  br.disabled = !rec && (S.starting || done);
+  const bp = $('btnPlay'); setBtn(bp, S.playing ? '■' : '▶', S.playing ? 'หยุดฟัง' : 'ฟัง'); bp.disabled = !done || busy;
+  $('btnRe').disabled = !done || busy;
+  $('btnPrev').disabled = busy || S.idx === 0;
+  const bn = $('btnNext'); bn.disabled = busy || S.idx === N - 1; bn.classList.toggle('primary', done && !bn.disabled);
+  document.querySelectorAll('.cell').forEach((b) => {
+    const i = +b.dataset.i, id = SENTENCES[i].id, d = S.recs.has(id);
+    b.className = 'cell' + (d ? ' done' : '') + (i === S.idx ? ' cur' : '');
+    b.disabled = busy;
+    b.textContent = id + (d ? ' ✓' : '');
+    b.setAttribute('aria-label', 'ประโยค ' + id + (d ? ' อัดแล้ว' : ' ยังไม่ได้อัด'));
+    if (i === S.idx) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+  });
+  const all = S.recs.size === N;
+  $('allDone').hidden = !all;
+  $('btnExport').textContent = '⬇ ดาวน์โหลด asr-' + (S.code || '…') + '.zip';
+  $('btnExport').disabled = !S.code || !S.recs.size || busy;
+  $('btnClear').disabled = !S.code || !S.recs.size || busy;
+  $('exportHint').textContent = !S.code ? 'ใส่รหัสผู้พูดก่อน' : (!S.recs.size ? 'อัดอย่างน้อย 1 ประโยคก่อน จึงจะดาวน์โหลดได้' :
+    (all ? 'อัดครบแล้ว กดดาวน์โหลดได้เลย' : 'ยังอัดไม่ครบ (' + S.recs.size + '/' + N + ') ดาวน์โหลดเท่าที่มีได้ แต่ควรอัดให้ครบก่อน'));
+}
+
+/* ---------- เริ่มต้น ---------- */
+function showNotices() {
+  const app = RecCore.inAppName(UA);
+  if (app) {
+    const row = document.createElement('div'); row.className = 'linkrow';
+    if (/^https?:/.test(location.href)) {
+      const inp = document.createElement('input'); inp.readOnly = true; inp.value = location.href; inp.setAttribute('aria-label', 'ลิงก์หน้านี้');
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = 'คัดลอกลิงก์';
+      b.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(location.href); say('ok', 'คัดลอกลิงก์แล้ว นำไปวางในช่องที่อยู่เว็บของ Chrome หรือ Safari'); }
+        catch (e) { inp.focus(); inp.select(); inp.setSelectionRange(0, 9999); say('info', 'แตะค้างที่ลิงก์แล้วเลือก "คัดลอก" จากนั้นนำไปวางใน Chrome หรือ Safari'); }
+      });
+      row.appendChild(inp); row.appendChild(b);
+    }
+    addNotice('warn', 'ตอนนี้เปิดอยู่ในแอป ' + app + ' ซึ่งมักบล็อกไมค์ ให้เปิดลิงก์นี้ด้วย Chrome หรือ Safari แทน: กดปุ่มเมนู (⋮ หรือ … หรือไอคอนแชร์) แล้วเลือก "เปิดในเบราว์เซอร์" / "Open in Chrome" / "Open in Safari" หรือคัดลอกลิงก์ไปวาง', row.childNodes.length ? row : null);
+  }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    addNotice('err', micErrorText({ name: 'NoMediaDevices' }));
+  } else if (MOBILE && location.protocol === 'file:') {
+    addNotice('warn', 'บนมือถือ ถ้าอัดแล้วไมค์ไม่ทำงาน ให้เปิดจากลิงก์ https:// ที่ได้รับแทนการเปิดไฟล์ในเครื่อง');
+  }
+}
+async function init() {
+  buildGrid(); render(); showNotices();
+  const inp = $('code');
+  inp.addEventListener('input', () => { const c = normCode(inp.value); if (c !== inp.value) inp.value = c; setCode(c); });
+  $('btnRec').addEventListener('click', onRecClick);
+  $('btnRe').addEventListener('click', onRecClick);
+  $('btnPlay').addEventListener('click', togglePlay);
+  $('btnPrev').addEventListener('click', () => go(S.idx - 1));
+  $('btnNext').addEventListener('click', () => go(S.idx + 1));
+  $('btnExport').addEventListener('click', doExport);
+  $('btnShare').addEventListener('click', doShare);
+  $('btnClear').addEventListener('click', doClear);
+  window.addEventListener('beforeunload', (e) => { if (S.recording) { e.preventDefault(); e.returnValue = ''; } });
+  try {                                      // จำว่าพับคำแนะนำไว้ (เฉพาะความสะดวก ไม่มีก็ไม่เป็นไร)
+    const tips = $('tips');
+    if (localStorage.getItem('asr-tips-closed') === '1') tips.open = false;
+    tips.addEventListener('toggle', () => { try { localStorage.setItem('asr-tips-closed', tips.open ? '0' : '1'); } catch (e) {} });
+  } catch (e) {}
+  try {
+    const c = await dbReq('kv', 'readonly', (os) => os.get('code'));
+    if (c) { inp.value = c; await setCode(c); }
+  } catch (e) { memOnly(); }
+}
+init();
+})();
+</script>
+</body>
+</html>
