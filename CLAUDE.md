@@ -29,9 +29,36 @@ Team lanes:
 - **D**: report + analysis.
 
 Demo pipeline: the student speaks Thai → Typhoon Whisper (ASR) → Typhoon Translate (TH→EN) → Qwen3 tutor (English)
-→ Typhoon Translate (EN→TH) → browser TTS avatar. The tutor brain in the demo is the same model we evaluate.
+→ Typhoon Translate (EN→TH) → browser TTS avatar.
+- **Main system (decided 2026-10-09): base Qwen3 + guard prompt + answer checker + leak filter.** This is the demo's tutor brain.
+  - The trained sft-v6 stays as the research model and the comparison arm, not the product. In the user's own testing it converses incoherently and follows the checker note only about half the time.
+  - Proposed rule for replacing the main system (not yet agreed by the team): the challenger must beat it on problems never used for tuning, on the confirm-minus-accept gap,
+    keep leaks at ≤ 1 per 100 in escalate5 and the personas, and not be rated worse in conversation by humans.
+  - Numbers for this system are optimistic: the checker was tuned partly on the test set, and the demo-mode figures (87.0 / 7.0 / 12.0) come from the faculty machine's notes and are not checked against raw files.
+  - The paper and abstract keep the fine-tuning results as evidence ("fine-tuning behaves like building the prompt into the model; the external checker is what helps").
 
 ## Current state
+**Status as of 10/10/2026 (read this first; the dated notes below are history and stop at round 4):**
+- **Main system:** base Qwen3 + guard prompt + answer checker config B (CHECKER_IMPROVED=1, CHECKER_NOTE=3, CHECKER_MODE=system, solver cache).
+  Test set, 3 runs: confirm 87.7%, false accept 7.0%, reject-correct 11.7%; leaks 0/100 strict in all 3 runs (lenient 1/100 in run 3).
+- **Rounds 5–6:** v5 = v4 + 386 wrong-step examples; v6 = v4 data + 412 wrong-step examples balanced against the 412 confirm examples.
+  Answer check (3-run means, confirm / false accept / reject-correct): base noguard 91.8/36.3/8.2 · base+guard 27.5/22.5/29.2 ·
+  v4 52.8/41.5/16.2 · v5 45.5/34.7/28.3 · v6 33.2/22.5/34.3 (gap ~11 for v4–v6). Main-cell leaks 0–2/100 every round; personas v6 ≤ 1 strict (base 78–89).
+- **Checker results:** v6+B 53.8/8.8/23.8 (gap 45, leaks 0 strict in 1 run). Base noguard + B (laptop, 1 run) 88.5/8.5/11.5 but leaks 90/100
+  → withholding and verification are separate functions. Solver matches gold 88–89/100; 88% of main-system errors fall on 11 solver-wrong problems
+  (in 6 the solver repeats the student's own mistake). v6+B confirms only 59% even when the checker is right (it ignores notes). See `analysis/failure_report.md`.
+- **Scope:** voice/ASR/TTS/avatar material is cut from the abstract and paper (PDPA). The demo may still exist separately; never add speech results to the paper.
+- **Abstract:** v19b = `report/paper/STE2027-structured-abstract.docx` (anonymous copy `…v19b-anon.docx`). Wins first; numbers where the trained model
+  loses go to the full paper's Discussion. Every leak claim must say strict or lenient.
+- **Locked held-out sets:** `testset2` (49, MathDial exhausted) and `testset_gsm` (300 from GSM8K test; wrong answers injected + phrased by Qwen3 → report
+  as a distribution shift). Not in git; SHA-256 in `data/LOCKED_TESTSETS_SHA256.txt`. Run once at the very end (`heldout` step); never tune on them.
+- **Round 7 (not run yet):** 7a = sft-v7 (sft-v6 + level-3 checker notes, 30% no-note; confirm rows with arithmetic errors dropped via
+  `tools/audit_confirm_work.py`); 7b = sft-v8 (self-distilled from base+guard+level-3 note with a simulated student). Queue `tools/faculty_r7.py`
+  and the adaptive attacker `tools/adaptive_attack.py` (nosolve; direct leak primary, selection_leak, oracle_exploit) are frozen on the USB in
+  `D:\ai-tutor-r7` with SHA256SUMS; mock-tested only, never run on real models.
+- **Win criteria for v7/v8:** only a draft (see "Main system" above). The team must lock them before the `heldout` step.
+- Laptop mirror of the faculty code for local evaluation: `../ai-tutor-eval-1010` (r6 zip + 09/10 overlay; verified to reproduce faculty numbers).
+
 - Tutor model:
   - `qwen3:4b-instruct-2507-q4_K_M` on Ollama, set in `tutor/config.py`.
   - For training, the Hugging Face model is `Qwen/Qwen3-4B-Instruct-2507`.
@@ -195,5 +222,5 @@ On the faculty machine, `python tools/faculty_run.py --round N` does steps 1–6
 1. Qwen3 baseline measured in all 4 conditions and shown on the status site.
 2. A QLoRA fine-tune of Qwen3-4B, evaluated on the same frozen set (3 repeats), that changes the chosen metric.
 3. A check that the trained tutor still confirms correct answers and teaches well (human ratings: 20 dialogues per person).
-4. A working Thai voice avatar demo that uses the trained model, plus a backup video.
+4. A working Thai voice avatar demo that uses the main system (base Qwen3 + guard + checker + leak filter, see "Demo pipeline"), plus a backup video.
 5. The report and slides, with honest numbers.
